@@ -1,8 +1,12 @@
 #include "Player.h"
 
-Player::handleMovement() {
-    float xMove = 0f;
-    float yMove = 0f;
+Player::Player(float x, float y, float health, float armour, Texture2D *texture) {
+}
+
+void Player::handleMovement()
+{
+    float xMove = 0.f;
+    float yMove = 0.f;
 
     if (IsKeyPressedRepeat('W')) { yMove -= 1; }
     if (IsKeyPressedRepeat('S')) { yMove += 1; }
