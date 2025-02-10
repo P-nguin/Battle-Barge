@@ -1,18 +1,26 @@
 #include "Player.h"
 
-Player::Player(float x, float y, float health, float armour, Texture2D *texture) {
-}
+Player::Player(float x, float y, float width, float height, float health, float armour, float speed, Texture2D *texture):
+    Entity(x, y, width, height, health, armour, height, speed, texture)
+{ }
 
-void Player::handleMovement()
+void Player::handleMovement(float deltaTime)
 {
     float xMove = 0.f;
     float yMove = 0.f;
 
-    if (IsKeyPressedRepeat('W')) { yMove -= 1; }
-    if (IsKeyPressedRepeat('S')) { yMove += 1; }
-    if (IsKeyPressedRepeat('A')) { xMove -= 1; }
-    if (IsKeyPressedRepeat('D')) { xMove += 1; }
+    if (IsKeyDown(KEY_W)) { yMove -= deltaTime*speed; }
+    if (IsKeyDown(KEY_S)) { yMove += deltaTime*speed; }
+    if (IsKeyDown(KEY_A)) { xMove -= deltaTime*speed; }
+    if (IsKeyDown(KEY_D)) { xMove += deltaTime*speed; }
 
-    x += xMove;
-    y += yMove;
+    move(xMove, yMove);
+}
+
+void Player::render() {
+    DrawRectangleRec(hitBox, WHITE);
+}
+
+void Player::update(float deltaTime) {
+    handleMovement(deltaTime);
 }

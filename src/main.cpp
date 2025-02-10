@@ -9,6 +9,8 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 
 #include "raylib.h"
 
+#include "Player/Player.h"
+
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
 int main ()
@@ -24,10 +26,15 @@ int main ()
 
 	// Load a texture from the resources directory
 	Texture wabbit = LoadTexture("wabbit_alpha.png");
+
+    Player player(0, 0, 32, 32, 10, 0, 64, nullptr);
 	
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
 	{
+        float getDeltaTime = GetFrameTime();
+        player.update(getDeltaTime);
+
 		// drawing
 		BeginDrawing();
 
@@ -36,6 +43,8 @@ int main ()
 
 		// draw some text using the default font
 		DrawText("Hello Raylib", 200,200,20,WHITE);
+
+        player.render();
 
 		// draw our texture to the screen
 		DrawTexture(wabbit, 400, 200, WHITE);

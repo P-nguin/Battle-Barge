@@ -1,9 +1,12 @@
+#include <string>
+
 #include "raylib.h"
 
 class Entity {
     protected:
         float x,y, width, height;
         float health, armour;
+        float speed;
         bool interactable;
 
         Texture2D* texture;
@@ -11,7 +14,7 @@ class Entity {
 
     public:
         // maybe add another ctor with setting hitbox
-        Entity(float x, float y, float width=32, float height=32, float health=10, float armour=0, bool interactable=false, Texture2D* texture=nullptr);
+        Entity(float x, float y, float width, float height, float health, float armour, float speed, bool interactable=false, Texture2D* texture=nullptr);
 
         ~Entity();
 
@@ -34,4 +37,5 @@ class Entity {
 
         virtual void render();
         virtual void update(float deltaTime) = 0;
+        virtual void interact(std::string cmd) = 0;
 };
