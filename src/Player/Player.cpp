@@ -1,7 +1,7 @@
 #include "Player.h"
 
-Player::Player(float x, float y, float width, float height, float health, float armour, float speed, Texture2D *texture):
-    Entity(x, y, width, height, health, armour, height, speed, texture)
+Player::Player(float x, float y, float width, float height, float health, float armour, float speed, Texture2D *texture)
+    : Entity(x, y, width, height, health, armour, height, speed, texture)
 { }
 
 void Player::handleMovement(float deltaTime)

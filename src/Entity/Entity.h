@@ -1,3 +1,6 @@
+#ifndef ENTITY_H
+#define ENTITY_H
+
 #include <string>
 
 #include "raylib.h"
@@ -39,3 +42,5 @@ class Entity {
         virtual void update(float deltaTime) = 0;
         virtual void interact(std::string cmd) = 0;
 };
+
+#endif
