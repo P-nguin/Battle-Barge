@@ -15,7 +15,10 @@ Turret::Turret(float x, float y, float forwardAngle, float width, float height, 
       reloadTime(reloadTime),
       ammoType(ammoType),
       turretType(turretType) 
-{}
+{
+    interactableHitBox.x = x - 5.f; interactableHitBox.y = y - 5.f;
+    interactableHitBox.width = width + 5.f; interactableHitBox.height = height + 5.f;
+}
 
 void Turret::fire() {
     if (ammo > 0) {
@@ -31,12 +34,29 @@ void Turret::fire() {
 
 void Turret::rotate(float angle) {
     localAngle += angle;
-    localAngle = fmod(localAngle, 360.0f); // Wrap localAngle to range [0, 360)
+    localAngle = fmod(localAngle, 360.0f);
 
     localAngle = std::max(localAngle, -MAXIMUN_ANGLE);
     localAngle = std::min(localAngle, MAXIMUN_ANGLE);
 
     globalAngle = forwardAngle + localAngle;
-    globalAngle = fmod(globalAngle, 360.0f); // Wrap globalAngle to range [0, 360)
+    globalAngle = fmod(globalAngle, 360.0f);
 }
 
+void Turret::render() {
+    DrawRectangleRec(hitBox, BROWN);
+
+    if(interactable) DrawRectangleRec(interactableHitBox, PURPLE);
+}
+
+void Turret::interact(TurretCommands cmd) {
+    if(cmd == TurretCommands::FIRE) fire();
+    else if(cmd == TurretCommands::TURNLEFT) rotate(-turnRate);
+    else if(cmd == TurretCommands::TURNRIGHT) rotate(turnRate);
+    else if(cmd == TurretCommands::RELOAD) reload();
+}
+
+void Turret::reload() {
+    // insta reload for now
+    ammo = MAXIMUN_AMMO;
+}

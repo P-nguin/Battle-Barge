@@ -40,7 +40,7 @@ class Entity {
 
         virtual void render();
         virtual void update(float deltaTime) = 0;
-        virtual void interact(std::string cmd) = 0;
+        //virtual void interact(std::string cmd) = 0;
 };
 
 #endif
