@@ -1,3 +1,5 @@
+#ifndef ENTITY_H
+#define ENTITY_H
 #include "raylib.h"
 
 class Entity {
@@ -35,3 +37,5 @@ class Entity {
         virtual void render();
         virtual void update(float deltaTime) = 0;
 };
+
+#endif

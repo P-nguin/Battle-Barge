@@ -1,3 +1,5 @@
+#ifndef PLAYER_H
+#define PLAYER_H
 #include "Entity/Entity.h"
 #include "raylib.h"
 
@@ -10,3 +12,6 @@ class Player : Entity {
         void render() override;
         void update(float deltaTime) override;
 };
+
+#endif
+
