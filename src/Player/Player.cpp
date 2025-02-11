@@ -1,7 +1,6 @@
 #include "Player.h"
 
-Player::Player(float x, float y, float health, float armour, Texture2D *texture) {
-}
+Player::Player(float x, float y, float health, float armour, Texture2D *texture) {}
 
 void Player::handleMovement()
 {
