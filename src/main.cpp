@@ -27,7 +27,25 @@ int main ()
 	// Load a texture from the resources directory
 	Texture wabbit = LoadTexture("wabbit_alpha.png");
 
-    Player player(0, 0, 32, 32, 10, 0, 64, nullptr);
+    float playerWidth = 32;
+    float playerHeight = 32;
+    std::vector<Vector2> playerVertices = {
+        {0, 0},
+        {playerWidth, 0},
+        {playerWidth, playerHeight},
+        {0, playerHeight}
+    };
+    Vector2 playerPosition = {400, 300};  // Start player in middle of screen
+    
+    Player player(
+        playerVertices,
+        playerPosition,
+        0.0f,           // initial rotation
+        10.0f,          // health
+        0.0f,           // armour
+        64.0f,          // speed
+        nullptr         // texture (using nullptr for now to see hitbox visualization)
+    );
 	
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window

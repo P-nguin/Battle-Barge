@@ -2,39 +2,42 @@
 #define ENTITY_H
 
 #include <string>
-
+#include <vector>
 #include "raylib.h"
+#include "HitBox/HitBox.h"
 
 class Entity {
     protected:
-        float x,y, width, height;
+        HitBox hitBox;
+        HitBox interactableHitBox;  // Optional hitbox for interaction
         float health, armour;
         float speed;
         bool interactable;
-
         Texture2D* texture;
-        Rectangle hitBox, interactableHitBox;
 
     public:
-        // maybe add another ctor with setting hitbox
-        Entity(float x, float y, float width, float height, float health, float armour, float speed, bool interactable=false, Texture2D* texture=nullptr);
-
+        Entity(const std::vector<Vector2>& vertices, Vector2 position, float rotation,
+               float health, float armour, float speed, bool interactable = false, 
+               Texture2D* texture = nullptr);
+        
         ~Entity();
 
-        float getX() const;
-        float getY() const;
+        // Position getters/setters
+        Vector2 getPosition() const;
+        float getRotation() const;
         float getHealth() const;
         float getArmour() const;
         Texture2D* getTexture() const;
+        const HitBox& getHitBox() const;
 
-        void setX(float x);
-        void setY(float y);
+        void setPosition(Vector2 position);
+        void setRotation(float rotation);
         void setHealth(float health);
         void setArmour(float armour);
         void setTexture(Texture2D* texture);
-        void setPosition(float x, float y);
 
-        void move(float x, float y);
+        void move(Vector2 offset);
+        void rotate(float angle);
         void addHealth(float amount);
         void addArmour(float amount);
 

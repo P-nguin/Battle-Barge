@@ -21,10 +21,10 @@ enum class TurretCommands {
 
 class Turret : public Entity {
 protected:
-    float forwardAngle;
-    float localAngle;
-    float globalAngle;
-    float MAXIMUN_ANGLE;
+    float forwardAngle;      // Base angle of the turret
+    float localAngle;        // Local rotation relative to forward angle
+    float globalAngle;       // Total rotation angle
+    float MAXIMUN_ANGLE;     // Maximum rotation from forward angle
     float turnRate;
 
     float range;
@@ -37,19 +37,25 @@ protected:
     int ammo;
     float reloadTime;
     AmmoType ammoType;
-
     TurretType turretType;
 
 public:
-    Turret(float x, float y, float forwardsAngle, float width, float height, float health, float armour, float turnRate, float range, float fireRate, int ammo, float reloadTime, Texture2D* texture, AmmoType ammoType, TurretType turretType);
+    Turret(const std::vector<Vector2>& vertices, Vector2 position, 
+           float forwardAngle, float health, float armour,
+           float turnRate, float range, float fireRate,
+           int ammo, float reloadTime, Texture2D* texture,
+           AmmoType ammoType, TurretType turretType);
     
     virtual void fire();
     virtual void reload();
-
     void rotate(float angle);
 
+    float getGlobalAngle() const { return globalAngle; }
+    float getLocalAngle() const { return localAngle; }
+    int getAmmo() const { return ammo; }
+
     void update(float deltaTime) override = 0;
-    virtual void render() override;
+    void render() override;
     virtual void interact(TurretCommands cmd);
 };
 
