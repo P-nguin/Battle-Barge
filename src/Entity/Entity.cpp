@@ -1,12 +1,17 @@
 #include "Entity.h"
 
-Entity::Entity(float x, float y, float width, float height, float health, float armour, float speed, bool interactable, Texture2D *texture):
-    x{x}, y{y}, health{health}, armour{armour}, height{height}, width{width}, speed{speed}, interactable{interactable}, texture{texture}
+Entity::Entity(const std::vector<Vector2>& vertices, Vector2 position, float rotation, float health, float armour, float speed, bool interactable, Texture2D* texture)
+    : hitBox(vertices, position, rotation), interactableHitBox(),
+      health(health), armour(armour), speed(speed),
+      interactable(interactable), texture(texture)
 {
-    hitBox.x = x; hitBox.y = y; hitBox.width = width; hitBox.height = height;
-    // probably want interactableHitBox to be slightly bigger
-    if(interactable) {
-        interactableHitBox.x = x; interactableHitBox.y = y; interactableHitBox.width = width; interactableHitBox.height = height;
+    if (interactable) {
+        std::vector<Vector2> interactVertices;
+        float padding = 5.0f;
+        for (const auto& vertex : vertices) {
+            interactVertices.push_back({ vertex.x + padding, vertex.y + padding });
+        }
+        interactableHitBox = HitBox(interactVertices, position, rotation);
     }
 }
 
@@ -19,36 +24,52 @@ Entity::~Entity()
 }
 
 void Entity::render() {
-    // Change later when we have a texture
-    DrawRectangleRec(hitBox, RED);
+    const std::vector<Vector2>& vertices = hitBox.getWorldVertices();
+    for (size_t i = 0; i < vertices.size(); i++) {
+        Vector2 start = vertices[i];
+        Vector2 end = vertices[(i + 1) % vertices.size()];
+        DrawLineV(start, end, RED);
+    }
 }
 
-float Entity::getX() const { return x; }
-float Entity::getY() const { return y; }
+Vector2 Entity::getPosition() const { return hitBox.getPosition(); }
+float Entity::getRotation() const { return hitBox.getRotation(); }
 float Entity::getHealth() const { return health; }
 float Entity::getArmour() const { return armour; }
 Texture2D* Entity::getTexture() const { return texture; }
+const HitBox& Entity::getHitBox() const { return hitBox; }
 
-void Entity::setX(float x) { 
-    this->x = x;
-    hitBox.x = x;
+void Entity::setPosition(Vector2 position) { 
+    hitBox.setPosition(position);
+    if (interactable) {
+        interactableHitBox.setPosition(position);
+    }
 }
-void Entity::setY(float y) { 
-    this->y = y; 
-    hitBox.y = y;
+
+void Entity::setRotation(float rotation) { 
+    hitBox.setRotation(rotation);
+    if (interactable) {
+        interactableHitBox.setRotation(rotation);
+    }
 }
+
 void Entity::setHealth(float health) { this->health = health; }
 void Entity::setArmour(float armour) { this->armour = armour; }
 void Entity::setTexture(Texture2D* texture) { this->texture = texture; }
 
-void Entity::setPosition(float x, float y) { 
-    this->x = x; this->y = y; 
-    hitBox.x = x; hitBox.y = y;
+void Entity::move(Vector2 offset) { 
+    hitBox.updatePosition(offset);
+    if(interactable) {
+        interactableHitBox.updatePosition(offset);
+    }
 }
-void Entity::move(float x, float y) { 
-    this->x += x; this->y += y; 
-    hitBox.x += x; hitBox.y += y;
-    // maybe x and y are redundent with the hitbox? idk
+
+void Entity::rotate(float angle) {
+    hitBox.updateRotation(angle);  // Update rotation with no position change
+    if (interactable) {
+        interactableHitBox.updateRotation(angle);
+    }
 }
-void Entity::addHealth(float amount) { this->health += health; }
-void Entity::addArmour(float amount) { this->armour += armour; }
+
+void Entity::addHealth(float amount) { health += amount; }
+void Entity::addArmour(float amount) { armour += amount; }

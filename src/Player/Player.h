@@ -1,12 +1,16 @@
+#ifndef PLAYER_H
+#define PLAYER_H
+
 #include "Entity/Entity.h"
 #include "raylib.h"
+#include <iostream>
 
-class Player : Entity {
+class Player : public Entity {
 public:
-    Player(float x, float y, float width, float height, float health, float armour, float speed, Texture2D* texture);
-
+    Player(const std::vector<Vector2>& vertices, Vector2 position, float rotation, float health, float armour, float speed, Texture2D* texture = nullptr);
     void handleMovement(float deltaTime);
     void render() override;
     void update(float deltaTime) override;
-    void interact(std::string cmd) override {} // Cannot interact with player for now I guess
 };
+
+#endif
