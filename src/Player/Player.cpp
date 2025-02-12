@@ -25,7 +25,6 @@ void Player::handleMovement(float deltaTime)
 }
 
 void Player::render() {
-    //DrawRectangle(getPosition().x, getPosition().y, 32, 32, WHITE);
     if (texture) {
         DrawTextureV(*texture, getPosition(), WHITE);
     } else {
