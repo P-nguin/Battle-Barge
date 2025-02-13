@@ -1,5 +1,7 @@
 #include "Player.h"
 
+#include <iostream>
+
 Player::Player(const std::vector<Vector2>& vertices, Vector2 position, float rotation,
                float health, float armour, float speed, Texture2D* texture)
     : Entity(vertices, position, rotation, health, armour, speed, false, texture)
@@ -22,11 +24,18 @@ void Player::handleMovement(float deltaTime)
     moveDirection.y *= speed * deltaTime;
 
     move(moveDirection);
+
+    Vector2 mousePos = GetMousePosition();
+    rotation = atan((mousePos.y - getPosition().y) / (mousePos.x - getPosition().x)) * RAD2DEG;
+    if (mousePos.x < getPosition().x) {
+        rotation += 180;
+    }
+
 }
 
 void Player::render() {
     if (texture) {
-        DrawTextureV(*texture, getPosition(), WHITE);
+        DrawTextureEx(*texture, getPosition(), rotation, 1, WHITE);
     } else {
         getHitBox().renderDebug(RED, BLUE);
     }

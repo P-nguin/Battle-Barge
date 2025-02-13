@@ -2,7 +2,7 @@
 
 Entity::Entity(const std::vector<Vector2>& vertices, Vector2 position, float rotation, float health, float armour, float speed, bool interactable, Texture2D* texture)
     : hitBox(vertices, position, rotation), interactableHitBox(),
-      health(health), armour(armour), speed(speed),
+      health(health), armour(armour), speed(speed), rotation(0),
       interactable(interactable), texture(texture)
 {
     if (interactable) {

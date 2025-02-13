@@ -44,7 +44,7 @@ int main ()
         10.0f,          // health
         0.0f,           // armour
         64.0f,          // speed
-        nullptr         // texture (using nullptr for now to see hitbox visualization)
+        &wabbit         // texture (using nullptr for now to see hitbox visualization)
     );
 	
 	// game loop
