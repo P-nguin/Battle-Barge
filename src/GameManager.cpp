@@ -8,6 +8,15 @@ GameManager::GameManager(TileMap tilemap): tilemap(tilemap) {
     Instance = this;
 }
 
-void GameManager::update() {
-    
+void GameManager::update(float deltaTime) {
+    for (Entity &entity : entities) {
+        entity.update(deltaTime);
+    }
+}
+
+void GameManager::render() {
+    tilemap.render();
+    for (Entity &entity : entities) {
+        entity.render();
+    }
 }
