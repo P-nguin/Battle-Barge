@@ -9,6 +9,8 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 
 #include "raylib.h"
 
+#include "Player/Player.h"
+
 #include "resource_dir.h"	// utility header for SearchAndSetResourceDir
 
 #include "Map/TileMap.h"
@@ -25,10 +27,35 @@ int main ()
 	SearchAndSetResourceDir("resources");
 
     TileMap tileMap(10, 10);
+	// Load a texture from the resources directory
+	Texture wabbit = LoadTexture("wabbit_alpha.png");
+
+    float playerWidth = 32;
+    float playerHeight = 32;
+    std::vector<Vector2> playerVertices = {
+        {0, 0},
+        {playerWidth, 0},
+        {playerWidth, playerHeight},
+        {0, playerHeight}
+    };
+    Vector2 playerPosition = {400, 300};  // Start player in middle of screen
+    
+    Player player(
+        playerVertices,
+        playerPosition,
+        0.0f,           // initial rotation
+        10.0f,          // health
+        0.0f,           // armour
+        64.0f,          // speed
+        &wabbit         // texture (using nullptr for now to see hitbox visualization)
+    );
 	
 	// game loop
 	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
 	{
+        float getDeltaTime = GetFrameTime();
+        player.update(getDeltaTime);
+
 		// drawing
 		BeginDrawing();
 
@@ -37,6 +64,14 @@ int main ()
 
         tileMap.render();
 
+		// draw some text using the default font
+		DrawText("Hello Raylib", 200,200,20,WHITE);
+
+        player.render();
+
+		// draw our texture to the screen
+		DrawTexture(wabbit, 400, 200, WHITE);
+		
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
 	}

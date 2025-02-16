@@ -1,17 +1,46 @@
 #include "Player.h"
 
-Player::Player(float x, float y, float health, float armour, Texture2D *texture) {}
+#include <iostream>
 
-void Player::handleMovement()
+Player::Player(const std::vector<Vector2>& vertices, Vector2 position, float rotation,
+               float health, float armour, float speed, Texture2D* texture)
+    : Entity(vertices, position, rotation, health, armour, speed, false, texture)
+{ }
+
+void Player::handleMovement(float deltaTime)
 {
-    float xMove = 0.f;
-    float yMove = 0.f;
+    Vector2 moveDirection = {0.0f, 0.0f};
 
-    if (IsKeyPressedRepeat('W')) { yMove -= 1; }
-    if (IsKeyPressedRepeat('S')) { yMove += 1; }
-    if (IsKeyPressedRepeat('A')) { xMove -= 1; }
-    if (IsKeyPressedRepeat('D')) { xMove += 1; }
+    if (IsKeyDown(KEY_W)) { moveDirection.y -= 1.0f; }
+    if (IsKeyDown(KEY_S)) { moveDirection.y += 1.0f; }
+    if (IsKeyDown(KEY_A)) { moveDirection.x -= 1.0f; }
+    if (IsKeyDown(KEY_D)) { moveDirection.x += 1.0f; }
 
-    x += xMove;
-    y += yMove;
+    if (moveDirection.x != 0.0f && moveDirection.y != 0.0f) {
+        moveDirection = Vector2Normalize(moveDirection);
+    }
+
+    moveDirection.x *= speed * deltaTime;
+    moveDirection.y *= speed * deltaTime;
+
+    move(moveDirection);
+
+    Vector2 mousePos = GetMousePosition();
+    rotation = atan((mousePos.y - getPosition().y) / (mousePos.x - getPosition().x)) * RAD2DEG;
+    if (mousePos.x < getPosition().x) {
+        rotation += 180;
+    }
+
+}
+
+void Player::render() {
+    if (texture) {
+        DrawTextureEx(*texture, getPosition(), rotation, 1, WHITE);
+    } else {
+        getHitBox().renderDebug(RED, BLUE);
+    }
+}
+
+void Player::update(float deltaTime) {
+    handleMovement(deltaTime);
 }

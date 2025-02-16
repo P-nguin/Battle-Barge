@@ -41,6 +41,7 @@
     "initializer_list": "cpp",
     "ios": "cpp",
     "iosfwd": "cpp",
+    "iostream": "cpp",
     "istream": "cpp",
     "limits": "cpp",
     "locale": "cpp",

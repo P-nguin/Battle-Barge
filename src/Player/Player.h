@@ -1,7 +1,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
+
 #include "Entity/Entity.h"
 #include "raylib.h"
+#include <iostream>
 
 class Player : Entity {
 
@@ -14,4 +16,3 @@ class Player : Entity {
 };
 
 #endif
-
