@@ -1,32 +1,27 @@
-/*
-Raylib example file.
-This is an example main file for a simple raylib project.
-Use this as a starting point or replace it with your code.
-
-by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit https://creativecommons.org/publicdomain/zero/1.0/
-
-*/
 #include "raylib.h"
-
 #include "Player/Player.h"
 #include "Turret/PlasmaCannon/PlasmaCannon.h"
 #include "Turret/Turret.h"
+#include "RocketLanguage/Tokenizer/Tokenizer.h"
+#include "resource_dir.h"
+#include <iostream>
 
-#include "resource_dir.h"	// utility header for SearchAndSetResourceDir
+// Test function declarations
+void testTokenizer();
+void printToken(const Rocket::Token& token);
 
-int main ()
-{
-	// Tell the window to use vsync and work on high DPI displays
-	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+int main() {
+    // Run tokenizer tests first
+    std::cout << "Running Tokenizer tests...\n";
+    testTokenizer();
+    std::cout << "Tokenizer tests completed.\n\n";
 
-	// Create the window and OpenGL context
-	InitWindow(1280, 800, "Hello Raylib");
-
-	// Utility function from resource_dir.h to find the resources folder and set it as the current working directory so we can load from it
-	SearchAndSetResourceDir("resources");
-
-	// Load a texture from the resources directory
-	Texture wabbit = LoadTexture("wabbit_alpha.png");
+    // Regular game initialization
+    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+    InitWindow(1280, 800, "Hello Raylib");
+    SearchAndSetResourceDir("resources");
+    
+    Texture wabbit = LoadTexture("wabbit_alpha.png");
 
     float playerWidth = 32;
     float playerHeight = 32;
@@ -36,7 +31,7 @@ int main ()
         {playerWidth, playerHeight},
         {0, playerHeight}
     };
-    Vector2 playerPosition = {400, 300};  // Start player in middle of screen
+    Vector2 playerPosition = {400, 300};
     
     Player player(
         playerVertices,
@@ -45,7 +40,7 @@ int main ()
         10.0f,          // health
         0.0f,           // armour
         64.0f,          // speed
-        nullptr         // texture (using nullptr for now to see hitbox visualization)
+        nullptr         // texture
     );
 
     float turretWidth = 40;
@@ -56,7 +51,7 @@ int main ()
         {turretWidth/2, turretHeight/2},
         {-turretWidth/2, turretHeight/2}
     };
-    Vector2 turretPosition = {600, 300};  // Position it to the right of the player
+    Vector2 turretPosition = {600, 300};
 
     PlasmaCannon plasmaCannon(
         turretVertices,
@@ -64,17 +59,15 @@ int main ()
         0.0f,           // forward angle
         20.0f,          // health
         5.0f,           // armour
-        5.0f,           // turn rate (degrees per second)
+        5.0f,           // turn rate
         200.0f,         // range
         1.0f,           // fire rate
         10,             // ammo
         2.0f,           // reload time
         nullptr         // texture
     );
-	
-	// game loop
-	while (!WindowShouldClose())		// run the loop untill the user presses ESCAPE or presses the Close button on the window
-	{
+    
+    while (!WindowShouldClose()) {
         float getDeltaTime = GetFrameTime();
         player.update(getDeltaTime);
 
@@ -91,31 +84,103 @@ int main ()
             plasmaCannon.interact(TurretCommands::RELOAD);
         }
 
-		// drawing
-		BeginDrawing();
-
-		// Setup the back buffer for drawing (clear color and depth buffers)
-		ClearBackground(BLACK);
-
-		// draw some text using the default font
-		DrawText("Hello Raylib", 200,200,20,WHITE);
-
+        BeginDrawing();
+        ClearBackground(BLACK);
+        DrawText("Hello Raylib", 200,200,20,WHITE);
         player.render();
-
         plasmaCannon.render();
+        DrawTexture(wabbit, 400, 200, WHITE);
+        EndDrawing();
+    }
 
-		// draw our texture to the screen
-		DrawTexture(wabbit, 400, 200, WHITE);
-		
-		// end the frame and get ready for the next one  (display frame, poll input, etc...)
-		EndDrawing();
-	}
+    UnloadTexture(wabbit);
+    CloseWindow();
+    return 0;
+}
 
-	// cleanup
-	// unload our texture so it can be cleaned up
-	UnloadTexture(wabbit);
+// Helper function to print token information
+void printToken(const Rocket::Token& token) {
+    std::cout << "Token{type=";
+    switch (token.type) {
+        case Rocket::TokenType::NUMBER: std::cout << "NUMBER"; break;
+        case Rocket::TokenType::SYMBOL: std::cout << "SYMBOL"; break;
+        case Rocket::TokenType::LPAREN: std::cout << "LPAREN"; break;
+        case Rocket::TokenType::RPAREN: std::cout << "RPAREN"; break;
+        case Rocket::TokenType::REGISTER: std::cout << "REGISTER"; break;
+        case Rocket::TokenType::END: std::cout << "END"; break;
+    }
+    std::cout << ", value='" << token.value 
+              << "', line=" << token.line 
+              << ", column=" << token.column << "}\n";
+}
 
-	// destroy the window and cleanup the OpenGL context
-	CloseWindow();
-	return 0;
+// Test function to verify tokenizer functionality
+void testTokenizer() {
+    // Test 1: Basic command
+    std::cout << "\nTest 1: Basic command\n";
+    {
+        Rocket::Tokenizer tokenizer("(forward 10)");
+        auto tokens = tokenizer.tokenize();
+        for (const auto& token : tokens) {
+            printToken(token);
+        }
+    }
+
+    // Test 2: Multiple commands
+    std::cout << "\nTest 2: Multiple commands\n";
+    {
+        Rocket::Tokenizer tokenizer("(forward 10)\n(turn 45)");
+        auto tokens = tokenizer.tokenize();
+        for (const auto& token : tokens) {
+            printToken(token);
+        }
+    }
+
+    // Test 3: Registers and arithmetic
+    std::cout << "\nTest 3: Registers and arithmetic\n";
+    {
+        Rocket::Tokenizer tokenizer("(+ $pos (- 20 5))");
+        auto tokens = tokenizer.tokenize();
+        for (const auto& token : tokens) {
+            printToken(token);
+        }
+    }
+
+    // Test 4: Negative and decimal numbers
+    std::cout << "\nTest 4: Negative and decimal numbers\n";
+    {
+        Rocket::Tokenizer tokenizer("-42 3.14 -0.5");
+        auto tokens = tokenizer.tokenize();
+        for (const auto& token : tokens) {
+            printToken(token);
+        }
+    }
+
+    // Test 5: Complex expression
+    std::cout << "\nTest 5: Complex expression\n";
+    {
+        Rocket::Tokenizer tokenizer("(forward (+ $distance (* 2 $speed)))");
+        auto tokens = tokenizer.tokenize();
+        for (const auto& token : tokens) {
+            printToken(token);
+        }
+    }
+
+    // Test 6: Error cases
+    std::cout << "\nTest 6: Error cases\n";
+    try {
+        Rocket::Tokenizer tokenizer("$");
+        tokenizer.nextToken();
+        std::cout << "Error: Should have thrown an exception for invalid register\n";
+    } catch (const std::runtime_error& e) {
+        std::cout << "Successfully caught error: " << e.what() << "\n";
+    }
+
+    try {
+        Rocket::Tokenizer tokenizer("42.");
+        tokenizer.nextToken();
+        std::cout << "Error: Should have thrown an exception for invalid decimal\n";
+    } catch (const std::runtime_error& e) {
+        std::cout << "Successfully caught error: " << e.what() << "\n";
+    }
 }

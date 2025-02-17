@@ -39,6 +39,7 @@ public:
     
     void setMaxEnergy(float newMax);
     void setEnergyLevel(float newLevel);
+    void updateEnergy(float deltaTime);
 
 private:
     const float MAX_ROTATION_SPEED = 180.0f;
@@ -48,8 +49,6 @@ private:
     float maxEnergy;
     bool isCodeRunning;
     RobotState currentState;
-
-    void updateEnergy(float deltaTime);
 };
 
 #endif
