@@ -1,5 +1,7 @@
 #include "GameManager.h"
 
+GameManager* GameManager::Instance = nullptr;
+
 GameManager::GameManager(TileMap tilemap): tilemap(tilemap) {
     if ((Instance != nullptr)) {
         std::cout << "GameManager instance already exists!" << std::endl;

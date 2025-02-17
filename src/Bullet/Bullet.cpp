@@ -1,6 +1,6 @@
 #include "Bullet.h"
 
-
+int Bullet::idCounter = 0;
 
 Bullet::Bullet(Vector2 position, float damage, float speed, Vector2 direction, Texture* texture): 
 position(position), damage(damage), speed(speed), direction(direction), texture(texture) { id = idCounter++; }
