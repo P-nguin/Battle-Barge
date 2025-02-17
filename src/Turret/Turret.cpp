@@ -54,49 +54,22 @@ void Turret::rotate(float angle) {
 
 void Turret::render() {
     if (texture) {
-        // Draw texture rotated at turret position
         Vector2 pos = getPosition();
         Rectangle source = { 0, 0, (float)texture->width, (float)texture->height };
         Rectangle dest = { pos.x, pos.y, (float)texture->width, (float)texture->height };
         Vector2 origin = { texture->width/2.0f, texture->height/2.0f };
         DrawTexturePro(*texture, source, dest, origin, globalAngle, WHITE);
     } else {
-        // Debug rendering
-        const std::vector<Vector2>& vertices = getHitBox().getWorldVertices();
+        getHitBox().renderDebug(RED, BLUE);
         
-        // Draw filled polygon
-        if (vertices.size() >= 3) {
-            Vector2* vertexArray = new Vector2[vertices.size()];
-            for (size_t i = 0; i < vertices.size(); i++) {
-                vertexArray[i] = vertices[i];
-            }
-            
-            DrawTriangleFan(vertexArray, vertices.size(), BROWN);
-            delete[] vertexArray;
-        }
-        
-        // Draw hitbox outline
-        for (size_t i = 0; i < vertices.size(); i++) {
-            Vector2 start = vertices[i];
-            Vector2 end = vertices[(i + 1) % vertices.size()];
-            DrawLineV(start, end, BLACK);
-        }
-
-        // Draw interaction hitbox if interactable
         if (interactable) {
-            const std::vector<Vector2>& interactVertices = interactableHitBox.getWorldVertices();
-            for (size_t i = 0; i < interactVertices.size(); i++) {
-                Vector2 start = interactVertices[i];
-                Vector2 end = interactVertices[(i + 1) % interactVertices.size()];
-                DrawLineV(start, end, PURPLE);
-            }
+            interactableHitBox.renderDebug(PURPLE, BLANK);
         }
 
-        // Draw direction indicator
         Vector2 pos = getPosition();
         Vector2 dir = { cosf(globalAngle * DEG2RAD), sinf(globalAngle * DEG2RAD) };
         Vector2 end = Vector2Add(pos, Vector2Scale(dir, 20.0f));
-        DrawLineV(pos, end, RED);
+        DrawLineV(pos, end, GREEN);
     }
 }
 
