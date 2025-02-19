@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include "Map/TileMap.h"
 #include "Player/Player.h"
 #include "Turret/PlasmaCannon/PlasmaCannon.h"
 #include "Turret/Turret.h"
@@ -23,7 +24,7 @@ int main() {
   
     TileMap tileMap(10, 10);
     
-    Texture wabbit = LoadTexture("wabbit_alpha.png");
+    Texture2D* wabbitTexture = new Texture2D(LoadTexture("wabbit_alpha.png"));
 
     float playerWidth = 32;
     float playerHeight = 32;
@@ -42,7 +43,7 @@ int main() {
         10.0f,          // health
         0.0f,           // armour
         64.0f,          // speed
-        &wabbit         // texture (using nullptr for now to see hitbox visualization)
+        wabbitTexture         // texture (using nullptr for now to see hitbox visualization)
     );
 
     float turretWidth = 40;
@@ -99,11 +100,10 @@ int main() {
 
       player.render();
       plasmaCannon.render();
-      DrawTexture(wabbit, 400, 200, WHITE);
+      DrawTexture(*wabbitTexture, 400, 200, WHITE);
       EndDrawing();
     }
 
-    UnloadTexture(wabbit);
     CloseWindow();
     return 0;
 }
