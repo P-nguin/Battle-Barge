@@ -20,6 +20,8 @@ int main() {
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
     InitWindow(1280, 800, "Hello Raylib");
     SearchAndSetResourceDir("resources");
+  
+    TileMap tileMap(10, 10);
     
     Texture wabbit = LoadTexture("wabbit_alpha.png");
 
@@ -40,7 +42,7 @@ int main() {
         10.0f,          // health
         0.0f,           // armour
         64.0f,          // speed
-        nullptr         // texture
+        &wabbit         // texture (using nullptr for now to see hitbox visualization)
     );
 
     float turretWidth = 40;
@@ -68,29 +70,37 @@ int main() {
     );
     
     while (!WindowShouldClose()) {
-        float getDeltaTime = GetFrameTime();
-        player.update(getDeltaTime);
+      float getDeltaTime = GetFrameTime();
+      player.update(getDeltaTime);
 
-        if (IsKeyPressed(KEY_SPACE)) {
-            plasmaCannon.interact(TurretCommands::FIRE);
-        }
-        if (IsKeyDown(KEY_LEFT)) {
-            plasmaCannon.interact(TurretCommands::TURNLEFT);
-        }
-        if (IsKeyDown(KEY_RIGHT)) {
-            plasmaCannon.interact(TurretCommands::TURNRIGHT);
-        }
-        if (IsKeyPressed(KEY_R)) {
-            plasmaCannon.interact(TurretCommands::RELOAD);
-        }
+      if (IsKeyPressed(KEY_SPACE)) {
+          plasmaCannon.interact(TurretCommands::FIRE);
+      }
+      if (IsKeyDown(KEY_LEFT)) {
+          plasmaCannon.interact(TurretCommands::TURNLEFT);
+      }
+      if (IsKeyDown(KEY_RIGHT)) {
+          plasmaCannon.interact(TurretCommands::TURNRIGHT);
+      }
+      if (IsKeyPressed(KEY_R)) {
+          plasmaCannon.interact(TurretCommands::RELOAD);
+      }
 
-        BeginDrawing();
-        ClearBackground(BLACK);
-        DrawText("Hello Raylib", 200,200,20,WHITE);
-        player.render();
-        plasmaCannon.render();
-        DrawTexture(wabbit, 400, 200, WHITE);
-        EndDrawing();
+		  // drawing
+      BeginDrawing();
+
+      // Setup the back buffer for drawing (clear color and depth buffers)
+      ClearBackground(BLACK);
+
+      tileMap.render();
+
+      // draw some text using the default font
+      DrawText("Hello Raylib", 200,200,20,WHITE);
+
+      player.render();
+      plasmaCannon.render();
+      DrawTexture(wabbit, 400, 200, WHITE);
+      EndDrawing();
     }
 
     UnloadTexture(wabbit);

@@ -12,6 +12,7 @@ class Entity {
         HitBox interactableHitBox;  // Optional hitbox for interaction
         float health, armour;
         float speed;
+        float rotation;
         bool interactable;
         Texture2D* texture;
 
