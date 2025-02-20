@@ -1,6 +1,6 @@
 #include "Tokenizer.h"
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
 
 namespace Rocket {
 
@@ -15,14 +15,13 @@ std::string Token::toString() const {
         case TokenType::SYMBOL: ss << "SYMBOL"; break;
         case TokenType::LPAREN: ss << "LPAREN"; break;
         case TokenType::RPAREN: ss << "RPAREN"; break;
-        case TokenType::REGISTER: ss << "REGISTER"; break;
+        case TokenType::BINDING: ss << "BINDING"; break;
         case TokenType::END: ss << "END"; break;
     }
-    ss << ", value='" << value << "', line=" << line << ", column=" << column << "}";
+    ss << ", value='" << value << "'}";
     return ss.str();
 }
 
-// Tokenizer implementation
 Tokenizer::Tokenizer(std::string source)
     : input(std::move(source)), position(0), line(1), column(1) {}
 
@@ -34,14 +33,11 @@ char Tokenizer::peek() const {
 char Tokenizer::advance() {
     char current = peek();
     position++;
-    
+    column++;
     if (current == '\n') {
         line++;
         column = 1;
-    } else {
-        column++;
     }
-    
     return current;
 }
 
@@ -60,21 +56,17 @@ Token Tokenizer::readNumber() {
     int startColumn = column;
     std::string number;
     
-    // Handle negative numbers
     if (peek() == '-') {
         number += advance();
     }
     
-    // Read integer part
     while (!isAtEnd() && isdigit(peek())) {
         number += advance();
     }
     
-    // Read decimal part if present
     if (peek() == '.') {
         number += advance();
         
-        // Must have at least one digit after decimal
         if (!isdigit(peek())) {
             throw std::runtime_error("Expected digit after decimal point");
         }
@@ -93,7 +85,7 @@ Token Tokenizer::readSymbol() {
     
     while (!isAtEnd()) {
         char c = peek();
-        if (isalnum(c) || c == '-' || c == '+' || c == '*' || c == '/') {
+        if (isalnum(c) || c == '-' || c == '+' || c == '*' || c == '/' || c == '_') {
             symbol += advance();
         } else {
             break;
@@ -103,7 +95,7 @@ Token Tokenizer::readSymbol() {
     return Token(TokenType::SYMBOL, symbol, line, startColumn);
 }
 
-Token Tokenizer::readRegister() {
+Token Tokenizer::readBinding() {
     int startColumn = column;
     advance(); // Skip the $
     
@@ -118,10 +110,14 @@ Token Tokenizer::readRegister() {
     }
     
     if (name.empty()) {
-        throw std::runtime_error("Expected register name after $");
+        throw std::runtime_error("Expected binding name after $");
     }
     
-    return Token(TokenType::REGISTER, name, line, startColumn);
+    return Token(TokenType::BINDING, name, line, startColumn);
+}
+
+bool Tokenizer::isAtEnd() const {
+    return position >= input.length();
 }
 
 Token Tokenizer::nextToken() {
@@ -144,7 +140,7 @@ Token Tokenizer::nextToken() {
     }
     
     if (c == '$') {
-        return readRegister();
+        return readBinding();
     }
     
     if (isdigit(c) || (c == '-' && position + 1 < input.length() && isdigit(input[position + 1]))) {
@@ -162,18 +158,6 @@ std::vector<Token> Tokenizer::tokenize() {
         if (token.type == TokenType::END) break;
     }
     return tokens;
-}
-
-int Tokenizer::getCurrentLine() const {
-    return line;
-}
-
-int Tokenizer::getCurrentColumn() const {
-    return column;
-}
-
-bool Tokenizer::isAtEnd() const {
-    return position >= input.length();
 }
 
 }

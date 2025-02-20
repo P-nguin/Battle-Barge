@@ -2,6 +2,23 @@
 
 namespace Rocket {
 
+std::string NumberExpr::toString() const {
+    return std::to_string(value);
+}
+
+std::string CommandExpr::toString() const {
+    std::string result = "(" + name;
+    for (const auto& arg : arguments) {
+        result += " " + arg->toString();
+    }
+    result += ")";
+    return result;
+}
+
+std::string BindingExpr::toString() const {
+    return "$" + name;
+}
+
 Token Parser::peek() const {
     if (isAtEnd()) return tokens.back();
     return tokens[current];
@@ -16,24 +33,6 @@ bool Parser::isAtEnd() const {
     return current >= tokens.size() || tokens[current].type == TokenType::END;
 }
 
-bool Parser::check(TokenType type) const {
-    if (isAtEnd()) return false;
-    return peek().type == type;
-}
-
-bool Parser::match(TokenType type) {
-    if (check(type)) {
-        advance();
-        return true;
-    }
-    return false;
-}
-
-Token Parser::consume(TokenType type, const std::string& message) {
-    if (check(type)) return advance();
-    throw ParseError(message, peek());
-}
-
 ExprPtr Parser::parseAtom() {
     Token token = advance();
     switch (token.type) {
@@ -41,34 +40,34 @@ ExprPtr Parser::parseAtom() {
             return std::make_shared<NumberExpr>(std::stod(token.value));
         case TokenType::SYMBOL:
             return std::make_shared<CommandExpr>(token.value, std::vector<ExprPtr>());
-        case TokenType::REGISTER:
-            return std::make_shared<RegisterExpr>(token.value);
+        case TokenType::BINDING:
+            return std::make_shared<BindingExpr>(token.value);
         default:
             throw ParseError("Unexpected token", token);
     }
 }
 
 ExprPtr Parser::parseList() {
-    // Consume the left parenthesis
-    consume(TokenType::LPAREN, "Expected '('");
+    // Consume left paren
+    advance();
     
-    // Parse the command/operator name
-    if (!check(TokenType::SYMBOL)) {
-        throw ParseError("Expected command or operator", peek());
+    if (peek().type != TokenType::SYMBOL) {
+        throw ParseError("Expected command name", peek());
     }
+
     Token commandToken = advance();
     std::vector<ExprPtr> arguments;
     
-    // Parse arguments until we hit the closing parenthesis
-    while (!check(TokenType::RPAREN)) {
+    // Parse arguments until right paren
+    while (peek().type != TokenType::RPAREN) {
         if (isAtEnd()) {
-            throw ParseError("Unterminated list, expected ')'", tokens.back());
+            throw ParseError("Unterminated list", tokens.back());
         }
         arguments.push_back(parse());
     }
     
-    // Consume the closing parenthesis
-    consume(TokenType::RPAREN, "Expected ')'");
+    // Consume right paren
+    advance();
     
     return std::make_shared<CommandExpr>(commandToken.value, arguments);
 }
@@ -83,6 +82,16 @@ ExprPtr Parser::parse() {
     }
 
     return parseAtom();
+}
+
+std::vector<ExprPtr> Parser::parseAll() {
+    std::vector<ExprPtr> expressions;
+    
+    while (!isAtEnd()) {
+        expressions.push_back(parse());
+    }
+    
+    return expressions;
 }
 
 }
