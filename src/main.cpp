@@ -102,9 +102,11 @@ int main() {
     InitWindow(1280, 800, "Hello Raylib");
     SearchAndSetResourceDir("resources");
   
-    TileMap tileMap(10, 10);
+    GameManager gameManager(30, 30);
     
     Texture2D* wabbitTexture = new Texture2D(LoadTexture("wabbit_alpha.png"));
+    Texture2D* turretTexture = new Texture2D(LoadTexture("Turrets/PlasmaTurret/SingleTurretLoaded.png"));
+    Texture2D* bulletTexture = new Texture2D(LoadTexture("wabbit_alpha.png")); // For bullets
 
     float playerWidth = 32;
     float playerHeight = 32;
@@ -115,7 +117,6 @@ int main() {
         {0, playerHeight}
     };
     Vector2 playerPosition = {400, 300};
-    
     Player player(playerVertices, playerPosition, 0.0f, 10.0f, 0.0f, 64.0f, wabbitTexture);
 
     float turretWidth = 40;
@@ -126,37 +127,76 @@ int main() {
         {turretWidth/2, turretHeight/2},
         {-turretWidth/2, turretHeight/2}
     };
-    Vector2 turretPosition = {600, 300};
 
-    PlasmaCannon plasmaCannon(turretVertices, turretPosition, 0.0f, 20.0f, 5.0f, 5.0f, 
-                             200.0f, 1.0f, 10, 2.0f, nullptr);
+    auto plasmaTurret = std::make_unique<PlasmaCannon>(
+        turretVertices,          // vertices
+        Vector2{600, 300},       // position
+        0.0f,                    // forward angle
+        100.0f,                  // health
+        5.0f,                    // armor
+        5.0f,                    // turn rate
+        200.0f,                  // range
+        1.0f,                    // fire rate
+        10,                      // ammo
+        2.0f,                    // reload time
+        turretTexture            // texture
+    );
+
+    PlasmaCannon* turretPtr = plasmaTurret.get();
+    gameManager.addTurret(std::move(plasmaTurret));
     
     while (!WindowShouldClose()) {
-        float getDeltaTime = GetFrameTime();
-        player.update(getDeltaTime);
+        float deltaTime = GetFrameTime();
+        
+        // Update player
+        player.update(deltaTime);
 
+        // Update game manager (handles turret and bullet updates)
+        gameManager.update(deltaTime);
+
+        // Direct turret testing through pointer
         if (IsKeyPressed(KEY_SPACE)) {
-            plasmaCannon.interact(TurretCommands::FIRE);
+            turretPtr->interact(TurretCommands::FIRE);
         }
         if (IsKeyDown(KEY_LEFT)) {
-            plasmaCannon.interact(TurretCommands::TURNLEFT);
+            turretPtr->interact(TurretCommands::TURNLEFT);
         }
         if (IsKeyDown(KEY_RIGHT)) {
-            plasmaCannon.interact(TurretCommands::TURNRIGHT);
+            turretPtr->interact(TurretCommands::TURNRIGHT);
         }
         if (IsKeyPressed(KEY_R)) {
-            plasmaCannon.interact(TurretCommands::RELOAD);
+            turretPtr->interact(TurretCommands::RELOAD);
         }
+
+        // Debug info
+        const char* debugInfo = TextFormat(
+            "Turret Info:\n"
+            "Position: (%.1f, %.1f)\n"
+            "Rotation: %.1f degrees\n"
+            "Ammo: %d",
+            turretPtr->getPosition().x,
+            turretPtr->getPosition().y,
+            turretPtr->getGlobalAngle(),
+            turretPtr->getAmmo()
+        );
 
         BeginDrawing();
         ClearBackground(BLACK);
-        tileMap.render();
-        DrawText("Hello Raylib", 200,200,20,WHITE);
+        
+        gameManager.render();
+        
         player.render();
-        plasmaCannon.render();
-        DrawTexture(*wabbitTexture, 400, 200, WHITE);
+        DrawText(debugInfo, 10, 10, 20, WHITE);
+        DrawText(TextFormat("FPS: %d", GetFPS()), 10, 100, 20, WHITE);
+        
         EndDrawing();
     }
+
+    // Cleanup
+    // UnloadTexture(*wabbitTexture); Player does this in the dtor
+    UnloadTexture(*bulletTexture);
+    // delete wabbitTexture; Player does this in the dtor
+    delete bulletTexture;
 
     CloseWindow();
     return 0;

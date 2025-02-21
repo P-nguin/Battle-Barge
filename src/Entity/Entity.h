@@ -21,7 +21,7 @@ class Entity {
                float health, float armour, float speed, bool interactable = false, 
                Texture2D* texture = nullptr);
         
-        ~Entity();
+        virtual ~Entity();
 
         // Position getters/setters
         Vector2 getPosition() const;

@@ -2,30 +2,24 @@
 
 int Bullet::idCounter = 0;
 
-Bullet::Bullet(Vector2 position, float damage, float speed, Vector2 direction, Texture* texture): 
-position(position), damage(damage), speed(speed), direction(direction), texture(texture) { id = idCounter++; }
-
-Bullet::Bullet(): position({0, 0}), damage(0), speed(0), direction({0, 0}), texture(nullptr) { id = idCounter++; }
-
-
-
-void Bullet::render() {
-    float rotation = atan((direction.y - position.y)/(direction.x - position.x)) * RAD2DEG;
-    if (rotation < 0) rotation += 180;
-    DrawTextureEx(*texture, position, rotation, 1, WHITE);
+Bullet::Bullet(const std::vector<Vector2>& vertices,
+               Vector2 position, 
+               float rotation,
+               float damage, 
+               float speed, 
+               Texture2D* texture)
+    : Entity(vertices, position, rotation, 1.0f, 0.0f, speed, false, texture),
+      damage(damage),
+      speed(speed)
+{
+    id = idCounter++;
 }
-
 
 void Bullet::update(float deltaTime) {
-    position += Vector2Scale(Vector2Normalize(direction), speed*deltaTime);
-
-    // if bullet is off screen, destroy it
-
-    // else if bullet collides with wall, destroy it
-    // Need to get entity somehow
-    
-    // else if bullet collides with enemy, destroy it
-    // Need to get entity somehow
-
+    float rotationRad = getRotation() * DEG2RAD;
+    Vector2 movement = {
+        cosf(rotationRad) * speed * deltaTime,
+        sinf(rotationRad) * speed * deltaTime
+    };
+    move(movement);
 }
-
