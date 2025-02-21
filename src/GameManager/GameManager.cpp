@@ -37,6 +37,18 @@ void GameManager::updateBullets(float deltaTime) {
     cleanupBullets();
 }
 
+void GameManager::checkBulletCollisions() {
+    for (auto& bullet : bullets) {
+        for (auto& enemy : enemies) {
+            if (bullet->getHitBox().checkCollision(enemy->getHitBox())) {
+                std::cout << "Taking damage" << std::endl;
+                enemy->takeDamage(*bullet);
+            }
+        }
+    }
+    std::cout << std::endl;
+}
+
 void GameManager::cleanupBullets() {
     bullets.erase(
         std::remove_if(bullets.begin(), bullets.end(),
@@ -88,14 +100,43 @@ void GameManager::updateTurrets(float deltaTime) {
     }
 }
 
+
+void GameManager::addEnemy(std::unique_ptr<Enemy> enemy){
+    enemies.push_back(std::move(enemy));
+}
+
+void GameManager::removeEnemy(Enemy* enemy){
+    enemies.erase(
+        std::remove_if(enemies.begin(), enemies.end(),
+            [enemy](const std::unique_ptr<Enemy>& e){
+                return e.get() == enemy;
+            }
+        ),
+        enemies.end()
+    );
+}
+
+void GameManager::updateEnemies(float deltaTime){
+    for (auto& enemy : enemies){
+        enemy->update(deltaTime);
+    }
+}
+
+
 void GameManager::update(float deltaTime) {
     handleTurretInput();
     updateTurrets(deltaTime);
     updateBullets(deltaTime);
+    updateEnemies(deltaTime);
 
     for (Entity& entity : entities) {
         entity.update(deltaTime);
     }
+
+    if (enemies.size() > 0 && bullets.size() > 0){
+        checkBulletCollisions();
+    }
+
 }
 
 void GameManager::render() {
@@ -111,5 +152,9 @@ void GameManager::render() {
     
     for (const auto& bullet : bullets) {
         bullet->render();
+    }
+
+    for (const auto& enemy : enemies){
+        enemy->render();
     }
 }

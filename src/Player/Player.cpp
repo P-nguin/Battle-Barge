@@ -20,8 +20,7 @@ void Player::handleMovement(float deltaTime)
         moveDirection = Vector2Normalize(moveDirection);
     }
 
-    moveDirection.x *= speed * deltaTime;
-    moveDirection.y *= speed * deltaTime;
+    moveDirection = Vector2Scale(moveDirection, speed * deltaTime);
 
     move(moveDirection);
 

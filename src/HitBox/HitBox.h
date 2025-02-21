@@ -15,8 +15,8 @@ private:
 
     std::vector<Vector2> getAxes() const;
     
-    bool hasOverlap(const HitBox& shape1, const HitBox& shape2, Vector2 axis);
-    ProjectionRange projectOntoAxis(const HitBox& shape, Vector2 axis);
+    bool hasOverlap(const HitBox& shape1, const HitBox& shape2, Vector2 axis) const;
+    ProjectionRange projectOntoAxis(const HitBox& shape, Vector2 axis) const;
 
 public:
     std::vector<Vector2> vertices;
@@ -33,7 +33,7 @@ public:
 
     void updatePosition(Vector2 move);
     void updateRotation(float rotate);
-    bool checkCollision(const HitBox& other);
+    bool checkCollision(const HitBox& other) const;
     
     void setPosition(Vector2 position) { this->position = position; }
     void setRotation(float rotation) { this->rotation = rotation; }

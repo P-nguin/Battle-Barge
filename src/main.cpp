@@ -144,6 +144,22 @@ int main() {
 
     PlasmaCannon* turretPtr = plasmaTurret.get();
     gameManager.addTurret(std::move(plasmaTurret));
+
+
+    // Create a test enemy
+    float enemyWidth = 32;
+    float enemyHeight = 32;
+    std::vector<Vector2> enemyVertices = {
+        {-enemyWidth/2, -enemyHeight/2},
+        {enemyWidth/2, -enemyHeight/2},
+        {enemyWidth/2, enemyHeight/2},
+        {-enemyWidth/2, enemyHeight/2}
+    };
+
+    Vector2 enemyPosition = {200, 300};
+    std::unique_ptr<Enemy> enemyTest = std::make_unique<Enemy>(enemyVertices, enemyPosition, 0, 10.0f, 0.0f, 64.0f, nullptr, 1.0f, 1.0f, Vector2{800, 300});
+
+    gameManager.addEnemy(std::move(enemyTest));
     
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
