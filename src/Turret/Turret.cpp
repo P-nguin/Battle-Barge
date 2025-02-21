@@ -9,7 +9,7 @@ Turret::Turret(const std::vector<Vector2>& vertices, Vector2 position,
       forwardAngle(forwardAngle),
       localAngle(0.0f),
       globalAngle(forwardAngle),
-      MAXIMUN_ANGLE(45.0f),  // You might want to make this configurable
+      MAXIMUN_ANGLE(45.0f),
       turnRate(turnRate),
       range(range),
       fireRate(fireRate),
@@ -39,13 +39,17 @@ void Turret::fire() {
     }
 }
 
-void Turret::rotate(float angle) {
-    localAngle += angle;
+void Turret::rotate(float angle, float deltaTime) {
+    // Apply smooth rotation based on delta time
+    float smoothAngle = angle * deltaTime;
+    localAngle += smoothAngle;
     localAngle = fmod(localAngle, 360.0f);
 
+    // Clamp to maximum rotation angles
     localAngle = std::max(localAngle, -MAXIMUN_ANGLE);
     localAngle = std::min(localAngle, MAXIMUN_ANGLE);
 
+    // Update global angle
     globalAngle = forwardAngle + localAngle;
     globalAngle = fmod(globalAngle, 360.0f);
     
@@ -71,6 +75,14 @@ void Turret::render() {
         Vector2 end = Vector2Add(pos, Vector2Scale(dir, 20.0f));
         DrawLineV(pos, end, GREEN);
     }
+
+    // Debug: Draw bullet spawn points
+    #ifdef _DEBUG
+    auto worldSpawns = getWorldSpawnPoints();
+    for (const auto& point : worldSpawns) {
+        DrawCircle(point.x, point.y, 3, RED);
+    }
+    #endif
 }
 
 void Turret::interact(TurretCommands cmd) {
@@ -79,10 +91,10 @@ void Turret::interact(TurretCommands cmd) {
             fire();
             break;
         case TurretCommands::TURNLEFT:
-            rotate(-turnRate);
+            rotate(-turnRate, GetFrameTime());
             break;
         case TurretCommands::TURNRIGHT:
-            rotate(turnRate);
+            rotate(turnRate, GetFrameTime());
             break;
         case TurretCommands::RELOAD:
             reload();
@@ -91,6 +103,27 @@ void Turret::interact(TurretCommands cmd) {
 }
 
 void Turret::reload() {
-    // insta reload for now
     ammo = MAXIMUN_AMMO;
+}
+
+void Turret::addBulletSpawnPoint(Vector2 localPoint) {
+    bulletSpawnPoints.push_back(localPoint);
+}
+
+std::vector<Vector2> Turret::getWorldSpawnPoints() const {
+    std::vector<Vector2> worldPoints;
+    const float radians = globalAngle * DEG2RAD;
+    Vector2 pos = getPosition();
+    
+    for (const auto& localPoint : bulletSpawnPoints) {
+        float rotatedX = localPoint.x * cosf(radians) - localPoint.y * sinf(radians);
+        float rotatedY = localPoint.x * sinf(radians) + localPoint.y * cosf(radians);
+        
+        worldPoints.push_back({
+            pos.x + rotatedX,
+            pos.y + rotatedY
+        });
+    }
+    
+    return worldPoints;
 }

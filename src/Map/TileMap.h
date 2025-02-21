@@ -10,6 +10,7 @@ public:
     std::vector<std::vector<Tile*>> tiles;
 
     TileMap(int width, int height);
+    TileMap() {};
     ~TileMap();
     void setTile(int x, int y, Tile* tile);
     void render() const;

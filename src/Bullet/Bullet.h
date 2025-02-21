@@ -1,40 +1,32 @@
 #ifndef BULLET_H
 #define BULLET_H
 
+#include "Entity/Entity.h"
 #include "raylib.h"
 #include <raymath.h>
 
-class Bullet {
-    private:
-        int id;
-        Vector2 position;
-        float damage, speed;
-        Vector2 direction;
-        Texture *texture;
+class Bullet : public Entity {
+private:
+    float damage;
+    float speed;
+    static int idCounter;
+    int id;
 
-        static int idCounter;
+public:
+    Bullet(const std::vector<Vector2>& vertices,
+           Vector2 position, 
+           float rotation,
+           float damage, 
+           float speed, 
+           Texture2D* texture = nullptr);
 
-    public:
-        Bullet(Vector2 position, float damage, float speed, Vector2 direction, Texture* texture);
-        Bullet();
+    float getDamage() const { return damage; }
+    float getSpeed() const { return speed; }
 
-        Vector2 getPosition() const { return position; };
-        float getDamage() const { return damage; };
-        float getSpeed() const { return speed; };
-        Vector2 getDirection() const { return direction; };
-        Texture* getTexture() const { return texture; };
+    void setDamage(float damage) { this->damage = damage; }
+    void setSpeed(float speed) { this->speed = speed; }
 
-        void setPosition(Vector2 position){ this->position = position; }
-        void setDamage(float damage){ this->damage = damage; }
-        void setSpeed(float speed){ this->speed = speed; }
-        void setDirection(Vector2 direction){ this->direction = direction; }
-        void setTexture(Texture* texture){ this->texture = texture; }
-
-        void render();
-        void update(float deltaTime);
-
-
-
+    void update(float deltaTime) override;
 };
 
 #endif
