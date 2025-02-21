@@ -30,12 +30,17 @@ void Player::handleMovement(float deltaTime)
     if (mousePos.x < getPosition().x) {
         rotation += 180;
     }
+    hitBox.setRotation(rotation);
 
 }
 
 void Player::render() {
     if (texture) {
-        DrawTextureEx(*texture, getPosition(), rotation, 1, WHITE);
+        Vector2 pos = getPosition();
+        Rectangle source = { 0, 0, (float)texture->width, (float)texture->height };
+        Rectangle dest = { pos.x, pos.y, (float)texture->width, (float)texture->height };
+        Vector2 origin = { texture->width/2.0f, texture->height/2.0f };
+        DrawTexturePro(*texture, source, dest, origin, getRotation(), WHITE);
     } else {
         getHitBox().renderDebug(RED, BLUE);
     }
