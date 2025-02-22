@@ -49,6 +49,7 @@ public:
     void cleanupBullets();
     void checkBulletCollisions();
 
+    std::vector<std::unique_ptr<Turret>>& getTurrets() { return turrets; }
     void addTurret(std::unique_ptr<Turret> turret);
     void removeTurret(Turret* turret);
     void updateTurrets(float deltaTime);

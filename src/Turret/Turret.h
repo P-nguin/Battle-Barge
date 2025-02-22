@@ -38,27 +38,26 @@ protected:
     AmmoType ammoType;
     TurretType turretType;
 
-    std::vector<Vector2> bulletSpawnPoints;  // Local coordinates for bullet spawns
+    std::vector<Vector2> bulletSpawnPoints; // Local coordinates for bullet spawns
 
 public:
-    Turret(const std::vector<Vector2>& vertices, Vector2 position, 
+    Turret(const std::vector<Vector2> &vertices, Vector2 position,
            float forwardAngle, float health, float armour,
            float turnRate, float range, float fireRate,
-           int ammo, float reloadTime, Texture2D* texture,
+           int ammo, float reloadTime, Texture2D *texture,
            AmmoType ammoType, TurretType turretType);
     virtual ~Turret() = default;
-    
+
     virtual void fire();
     virtual void reload();
-    void rotate(float angle, float deltaTime);  // Updated to include deltaTime
+    void rotate(float angle, float deltaTime); // Updated to include deltaTime
 
     float getGlobalAngle() const { return globalAngle; }
     float getLocalAngle() const { return localAngle; }
     int getAmmo() const { return ammo; }
 
-    void update(float deltaTime) override = 0;
-    void render() override;
-    virtual void interact(TurretCommands cmd);
+    void render();
+    void interact(TurretCommands cmd);
 
     void addBulletSpawnPoint(Vector2 localPoint);
     std::vector<Vector2> getWorldSpawnPoints() const;

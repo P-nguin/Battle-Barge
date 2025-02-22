@@ -6,6 +6,8 @@
 #include "raylib.h"
 #include "HitBox/HitBox.h"
 
+enum class TurretCommands;
+
 class Entity {
     protected:
         HitBox hitBox;
@@ -42,7 +44,6 @@ class Entity {
 
         virtual void render();
         virtual void update(float deltaTime) = 0;
-        // virtual void interact(const std::string& cmd) = 0;
 };
 
 class InteractableEntity : public Entity {
@@ -59,6 +60,7 @@ class InteractableEntity : public Entity {
         virtual void move(Vector2 offset) override;
         virtual void rotate(float angle) override;
 
+        virtual void interact(TurretCommands cmd) = 0;
 };
 
 

@@ -45,7 +45,27 @@ void Player::render() {
     }
 }
 
+bool Player::checkInteract(InteractableEntity* &entity) {
+    for (auto& turret : GameManager::Instance->getTurrets()) {
+        if (turret->getHitBox().checkCollision(hitBox)) {
+            entity = turret.get();
+            return true;
+        }
+    }
+    entity = nullptr;
+    return false;
+}
+
 void Player::update(float deltaTime) {
     handleMovement(deltaTime);
-    // checkInteract({0, 1}, 10, nullptr);
+
+    if (IsKeyPressed(KEY_F)) {
+        InteractableEntity* turret = nullptr;
+        if (checkInteract(turret)){
+            std::cout << "Interacting with turret: " << turret << std::endl;
+            turret->interact(TurretCommands::FIRE);
+        } else {
+            std::cout << "No interactable entity found" << std::endl;
+        }
+    }
 }
