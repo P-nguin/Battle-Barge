@@ -10,16 +10,15 @@ Bullet::Bullet(const std::vector<Vector2>& vertices,
                Texture2D* texture)
     : Entity(vertices, position, rotation, 1.0f, 0.0f, speed, false, texture),
       damage(damage),
-      speed(speed)
-{
-    id = idCounter++;
-}
+      speed(speed), id{idCounter++}
+{ std::cout << "Bullet created: " << id << std::endl; }
 
 void Bullet::update(float deltaTime) {
     float rotationRad = getRotation() * DEG2RAD;
     Vector2 movement = {
-        cosf(rotationRad) * speed * deltaTime,
-        sinf(rotationRad) * speed * deltaTime
+        cosf(rotationRad),
+        sinf(rotationRad)
     };
+    movement = Vector2Scale(Vector2Normalize(movement), speed * deltaTime);
     move(movement);
 }

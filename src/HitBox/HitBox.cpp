@@ -21,7 +21,7 @@ HitBox::HitBox(std::vector<Vector2> vertices, Vector2 position, float rotation) 
         this->rotation = rotation;
     }
 
-bool HitBox::checkCollision(const HitBox& other) {
+bool HitBox::checkCollision(const HitBox& other) const {
     std::vector<Vector2> axes1 = getAxes();
     std::vector<Vector2> axes2 = other.getAxes();
     
@@ -71,14 +71,14 @@ std::vector<Vector2> HitBox::getWorldVertices() const {
     return worldVertices;
 }
 
-bool HitBox::hasOverlap(const HitBox& shape1, const HitBox& shape2, Vector2 axis) {
+bool HitBox::hasOverlap(const HitBox& shape1, const HitBox& shape2, Vector2 axis) const {
     ProjectionRange proj1 = projectOntoAxis(shape1, axis);
     ProjectionRange proj2 = projectOntoAxis(shape2, axis);
     
     return proj1.max >= proj2.min && proj2.max >= proj1.min;
 }
 
-HitBox::ProjectionRange HitBox::projectOntoAxis(const HitBox& shape, Vector2 axis) {
+HitBox::ProjectionRange HitBox::projectOntoAxis(const HitBox& shape, Vector2 axis) const {
     std::vector<Vector2> worldVertices = shape.getWorldVertices();
     
     float min = Vector2DotProduct(worldVertices[0], axis);

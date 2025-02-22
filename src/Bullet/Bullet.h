@@ -4,13 +4,14 @@
 #include "Entity/Entity.h"
 #include "raylib.h"
 #include <raymath.h>
+#include <iostream>
 
 class Bullet : public Entity {
 private:
     float damage;
     float speed;
     static int idCounter;
-    int id;
+    const int id;
 
 public:
     Bullet(const std::vector<Vector2>& vertices,
@@ -22,6 +23,7 @@ public:
 
     float getDamage() const { return damage; }
     float getSpeed() const { return speed; }
+    int getId() const { return id; }
 
     void setDamage(float damage) { this->damage = damage; }
     void setSpeed(float speed) { this->speed = speed; }

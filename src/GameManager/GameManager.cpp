@@ -36,6 +36,28 @@ void GameManager::updateBullets(float deltaTime) {
         bullet->update(deltaTime);
     }
     cleanupBullets();
+    checkBulletCollisions();
+}
+
+void GameManager::checkBulletCollisions() {
+    if (bullets.empty() || enemies.empty()) {
+        return;
+    }
+    std::vector<Enemy*> enemiesToRemove;
+    for (auto& bullet : bullets) {
+        for (auto& enemy : enemies) {
+            if (bullet->getHitBox().checkCollision(enemy->getHitBox())) {
+                // std::cout << "interscting" << std::endl;
+                if (enemy->takeDamage(bullet.get())){
+                    enemiesToRemove.push_back(enemy.get());
+                }
+            }
+        }
+    }
+
+    for (auto& enemy : enemiesToRemove) {
+        removeEnemy(enemy);
+    }
 }
 
 void GameManager::cleanupBullets() {
@@ -69,6 +91,45 @@ void GameManager::removeTurret(Turret* turret) {
 void GameManager::updateTurrets(float deltaTime) {
     for (auto& turret : turrets) {
         turret->update(deltaTime);
+    }
+}
+
+
+void GameManager::addEnemy(std::unique_ptr<Enemy> enemy){
+    enemies.push_back(std::move(enemy));
+}
+
+void GameManager::removeEnemy(Enemy* enemy){
+    enemies.erase(
+        std::remove_if(enemies.begin(), enemies.end(),
+            [enemy](const std::unique_ptr<Enemy>& e){
+                return e.get() == enemy;
+            }
+        ),
+        enemies.end()
+    );
+}
+
+void GameManager::updateEnemies(float deltaTime){
+    for (auto& enemy : enemies){
+        enemy->update(deltaTime);
+    }
+}
+
+void GameManager::handleTurretInput() {
+    for (auto& turret : turrets) {
+        if (IsKeyPressed(KEY_SPACE)) {
+            turret->interact(TurretCommands::FIRE);
+        }
+        if (IsKeyDown(KEY_LEFT)) {
+            turret->interact(TurretCommands::TURNLEFT);
+        }
+        if (IsKeyDown(KEY_RIGHT)) {
+            turret->interact(TurretCommands::TURNRIGHT);
+        }
+        if (IsKeyPressed(KEY_R)) {
+            turret->interact(TurretCommands::RELOAD);
+        }
     }
 }
 
@@ -117,8 +178,12 @@ void GameManager::update(float deltaTime) {
         }
     }
     else if (currentMode == GameMode::PLAY) {
-        updateTurrets(deltaTime);
-        updateBullets(deltaTime);
+    
+
+    handleTurretInput();
+    updateTurrets(deltaTime);
+    updateBullets(deltaTime);
+    updateEnemies(deltaTime);
 
         for (Entity& entity : entities) {
             entity.update(deltaTime);
@@ -142,5 +207,9 @@ void GameManager::render() {
     
     for (const auto& bullet : bullets) {
         bullet->render();
+    }
+
+    for (const auto& enemy : enemies){
+        enemy->render();
     }
 }

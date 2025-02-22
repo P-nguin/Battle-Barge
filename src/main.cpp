@@ -144,6 +144,22 @@ int main() {
 
     PlasmaCannon* turretPtr = plasmaTurret.get();
     gameManager.addTurret(std::move(plasmaTurret));
+
+
+    // Create a test enemy
+    float enemyWidth = 32;
+    float enemyHeight = 32;
+    std::vector<Vector2> enemyVertices = {
+        {-enemyWidth/2, -enemyHeight/2},
+        {enemyWidth/2, -enemyHeight/2},
+        {enemyWidth/2, enemyHeight/2},
+        {-enemyWidth/2, enemyHeight/2}
+    };
+
+    Vector2 enemyPosition = {700, 300};
+    std::unique_ptr<Enemy> enemyTest = std::make_unique<Enemy>(enemyVertices, enemyPosition, 0, 30.0f, 0.0f, 64.0f, nullptr, 1.0f, 1.0f, Vector2{700, 300});
+
+    gameManager.addEnemy(std::move(enemyTest));
     
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
@@ -154,19 +170,19 @@ int main() {
         // Update game manager (handles turret and bullet updates)
         gameManager.update(deltaTime);
 
-        // Direct turret testing through pointer
-        if (IsKeyPressed(KEY_SPACE)) {
-            turretPtr->interact(TurretCommands::FIRE);
-        }
-        if (IsKeyDown(KEY_LEFT)) {
-            turretPtr->interact(TurretCommands::TURNLEFT);
-        }
-        if (IsKeyDown(KEY_RIGHT)) {
-            turretPtr->interact(TurretCommands::TURNRIGHT);
-        }
-        if (IsKeyPressed(KEY_R)) {
-            turretPtr->interact(TurretCommands::RELOAD);
-        }
+        // // Direct turret testing through pointer
+        // if (IsKeyPressed(KEY_SPACE)) {
+        //     turretPtr->interact(TurretCommands::FIRE);
+        // }
+        // if (IsKeyDown(KEY_LEFT)) {
+        //     turretPtr->interact(TurretCommands::TURNLEFT);
+        // }
+        // if (IsKeyDown(KEY_RIGHT)) {
+        //     turretPtr->interact(TurretCommands::TURNRIGHT);
+        // }
+        // if (IsKeyPressed(KEY_R)) {
+        //     turretPtr->interact(TurretCommands::RELOAD);
+        // }
 
         // Debug info
         const char* debugInfo = TextFormat(

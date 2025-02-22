@@ -9,6 +9,9 @@
 #include "Entity/Entity.h"
 #include "Bullet/Bullet.h"
 #include "Turret/Turret.h"
+#include "Entity/Enemy/Enemy.h"
+
+class Enemy;
 
 enum class GameMode {
     PLAY,
@@ -26,8 +29,12 @@ private:
     std::vector<std::unique_ptr<Turret>> turrets;
 
     GameMode currentMode;
+    std::vector<std::unique_ptr<Enemy>> enemies;
     
 public:
+    const float HIT_COOLDOWN = 1.0f;
+
+
     GameManager(int mapWidth, int mapHeight);
     ~GameManager() = default;
 
@@ -39,12 +46,20 @@ public:
     void createBullet(Vector2 position, float damage, float speed, float rotation, Texture2D* texture);
     void updateBullets(float deltaTime);
     void cleanupBullets();
+    void checkBulletCollisions();
 
     void addTurret(std::unique_ptr<Turret> turret);
     void removeTurret(Turret* turret);
     void updateTurrets(float deltaTime);
 
+    void handleTurretInput();
     void handleBuildModeInput();
+    void addEnemy(std::unique_ptr<Enemy> enemy);
+    void removeEnemy(Enemy* enemy);
+    void updateEnemies(float deltaTime);
+    
+    void update(float deltaTime);
+    void render();
 };
 
 #endif
