@@ -4,7 +4,7 @@
 
 Player::Player(const std::vector<Vector2>& vertices, Vector2 position, float rotation,
                float health, float armour, float speed, Texture2D* texture)
-    : Entity(vertices, position, rotation, health, armour, speed, false, texture)
+    : Entity(vertices, position, rotation, health, armour, speed, texture)
 { }
 
 void Player::handleMovement(float deltaTime)
@@ -47,4 +47,5 @@ void Player::render() {
 
 void Player::update(float deltaTime) {
     handleMovement(deltaTime);
+    // checkInteract({0, 1}, 10, nullptr);
 }

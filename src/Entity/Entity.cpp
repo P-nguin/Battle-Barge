@@ -1,19 +1,10 @@
 #include "Entity.h"
 
-Entity::Entity(const std::vector<Vector2>& vertices, Vector2 position, float rotation, float health, float armour, float speed, bool interactable, Texture2D* texture)
-    : hitBox(vertices, position, rotation), interactableHitBox(),
-      health(health), armour(armour), speed(speed), rotation(0),
-      interactable(interactable), texture(texture)
-{
-    if (interactable) {
-        std::vector<Vector2> interactVertices;
-        float padding = 5.0f;
-        for (const auto& vertex : vertices) {
-            interactVertices.push_back({ vertex.x + padding, vertex.y + padding });
-        }
-        interactableHitBox = HitBox(interactVertices, position, rotation);
-    }
-}
+Entity::Entity(const std::vector<Vector2>& vertices, Vector2 position, float rotation, float health, float armour, float speed, Texture2D* texture)
+    : hitBox(vertices, position, rotation),
+      health(health), armour(armour), speed(speed), rotation(0), 
+      texture(texture)
+{}
 
 Entity::~Entity()
 {
@@ -41,16 +32,10 @@ const HitBox& Entity::getHitBox() const { return hitBox; }
 
 void Entity::setPosition(Vector2 position) { 
     hitBox.setPosition(position);
-    if (interactable) {
-        interactableHitBox.setPosition(position);
-    }
 }
 
 void Entity::setRotation(float rotation) { 
     hitBox.setRotation(rotation);
-    if (interactable) {
-        interactableHitBox.setRotation(rotation);
-    }
 }
 
 void Entity::setHealth(float health) { this->health = health; }
@@ -59,17 +44,39 @@ void Entity::setTexture(Texture2D* texture) { this->texture = texture; }
 
 void Entity::move(Vector2 offset) { 
     hitBox.updatePosition(offset);
-    if(interactable) {
-        interactableHitBox.updatePosition(offset);
-    }
+
 }
 
 void Entity::rotate(float angle) {
     hitBox.updateRotation(angle);  // Update rotation with no position change
-    if (interactable) {
-        interactableHitBox.updateRotation(angle);
-    }
+
 }
 
 void Entity::addHealth(float amount) { health += amount; }
 void Entity::addArmour(float amount) { armour += amount; }
+
+
+InteractableEntity::InteractableEntity(const std::vector<Vector2>& vertices, Vector2 position, float rotation, float health, float armour, float speed, Texture2D* texture)
+    : Entity(vertices, position, rotation, health, armour, speed, texture),
+      interactableHitBox(vertices, position, rotation)
+{}
+
+void InteractableEntity::setPosition(Vector2 position) { 
+    interactableHitBox.setPosition(position);
+    Entity::setPosition(position);
+}
+
+void InteractableEntity::setRotation(float rotation) { 
+    interactableHitBox.setRotation(rotation);
+    Entity::setRotation(rotation);
+}
+
+void InteractableEntity::move(Vector2 offset) { 
+    interactableHitBox.updatePosition(offset);
+    Entity::move(offset);
+}
+
+void InteractableEntity::rotate(float angle) {
+    interactableHitBox.updateRotation(angle);
+    Entity::rotate(angle);
+}

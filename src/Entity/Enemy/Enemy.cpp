@@ -2,7 +2,7 @@
 
 Enemy::Enemy(const std::vector<Vector2>& vertices, Vector2 position, float rotation,
              float health, float armour, float speed, Texture2D* texture, float damage, float atkSpeed, Vector2 targetPosition)
-    : Entity(vertices, position, rotation, health, armour, speed, false, texture),
+    : Entity(vertices, position, rotation, health, armour, speed, texture),
       damage(damage),
       attackSpeed(atkSpeed),
       targetPosition(targetPosition)

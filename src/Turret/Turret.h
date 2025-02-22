@@ -19,7 +19,7 @@ enum class TurretCommands {
     RELOAD,
 };
 
-class Turret : public Entity {
+class Turret : public InteractableEntity {
 protected:
     float forwardAngle;
     float localAngle;
