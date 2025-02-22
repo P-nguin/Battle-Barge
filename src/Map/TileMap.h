@@ -14,6 +14,11 @@ public:
     ~TileMap();
     void setTile(int x, int y, Tile* tile);
     void render() const;
+    void renderGrid() const;
+
+    Tile* getTileAtScreenPosition(Vector2 screenPos);
+    bool isTileOccupied(int x, int y) const;
+    void removeTile(int x, int y);
 };
 
 #endif
