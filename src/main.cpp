@@ -170,19 +170,19 @@ int main() {
         // Update game manager (handles turret and bullet updates)
         gameManager.update(deltaTime);
 
-        // Direct turret testing through pointer
-        if (IsKeyPressed(KEY_SPACE)) {
-            turretPtr->interact(TurretCommands::FIRE);
-        }
-        if (IsKeyDown(KEY_LEFT)) {
-            turretPtr->interact(TurretCommands::TURNLEFT);
-        }
-        if (IsKeyDown(KEY_RIGHT)) {
-            turretPtr->interact(TurretCommands::TURNRIGHT);
-        }
-        if (IsKeyPressed(KEY_R)) {
-            turretPtr->interact(TurretCommands::RELOAD);
-        }
+        // // Direct turret testing through pointer
+        // if (IsKeyPressed(KEY_SPACE)) {
+        //     turretPtr->interact(TurretCommands::FIRE);
+        // }
+        // if (IsKeyDown(KEY_LEFT)) {
+        //     turretPtr->interact(TurretCommands::TURNLEFT);
+        // }
+        // if (IsKeyDown(KEY_RIGHT)) {
+        //     turretPtr->interact(TurretCommands::TURNRIGHT);
+        // }
+        // if (IsKeyPressed(KEY_R)) {
+        //     turretPtr->interact(TurretCommands::RELOAD);
+        // }
 
         // Debug info
         const char* debugInfo = TextFormat(

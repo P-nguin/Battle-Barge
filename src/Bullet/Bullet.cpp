@@ -16,8 +16,9 @@ Bullet::Bullet(const std::vector<Vector2>& vertices,
 void Bullet::update(float deltaTime) {
     float rotationRad = getRotation() * DEG2RAD;
     Vector2 movement = {
-        cosf(rotationRad) * speed * deltaTime,
-        sinf(rotationRad) * speed * deltaTime
+        cosf(rotationRad),
+        sinf(rotationRad)
     };
+    movement = Vector2Scale(Vector2Normalize(movement), speed * deltaTime);
     move(movement);
 }

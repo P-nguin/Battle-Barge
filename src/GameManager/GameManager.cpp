@@ -34,8 +34,8 @@ void GameManager::updateBullets(float deltaTime) {
     for (auto& bullet : bullets) {
         bullet->update(deltaTime);
     }
-    checkBulletCollisions();
     cleanupBullets();
+    checkBulletCollisions();
 }
 
 void GameManager::checkBulletCollisions() {
