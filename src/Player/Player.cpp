@@ -24,11 +24,21 @@ void Player::handleMovement(float deltaTime)
 
     move(moveDirection);
 
-    Vector2 mousePos = GetMousePosition();
-    rotation = atan((mousePos.y - getPosition().y) / (mousePos.x - getPosition().x)) * RAD2DEG;
-    if (mousePos.x < getPosition().x) {
-        rotation += 180;
-    }
+    // Vector2 relMousePos = GetWorldToScreen2D(getPosition(), CameraController::Instance->getCamera());
+    Vector2 relMousePos = GetScreenToWorld2D(GetMousePosition(), GameManager::Instance->getCameraController().getCamera());
+    Vector2 lookDir = Vector2Subtract(relMousePos, getPosition());
+    
+    // if (relMousePos.x < getPosition().x) {
+    //     rotation += 180;
+    // }
+    // std::cout << rotation << std::endl;
+    relMousePos = GameManager::Instance->getCameraController().getScreenToWorld(GetMousePosition());
+    lookDir = Vector2Subtract(relMousePos, getPosition());
+    std::cout << lookDir.x << " " << lookDir.y << std::endl;
+    std::cout << getPosition().x << " " << getPosition().y << std::endl;
+    std::cout << std::endl;
+    
+    rotation = atan((lookDir.y)/(lookDir.x)) * RAD2DEG;
     hitBox.setRotation(rotation);
 
 }

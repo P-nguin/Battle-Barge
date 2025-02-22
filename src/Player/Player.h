@@ -6,6 +6,7 @@
 #include <iostream>
 #include "GameManager/GameManager.h"
 #include "Turret/Turret.h"
+#include "CameraController/CameraController.h"
 
 class Player : public Entity {
     private:

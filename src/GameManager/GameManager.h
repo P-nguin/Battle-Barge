@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <bits/stdc++.h>
+
 #include "Map/TileMap.h"
 #include "Entity/Entity.h"
 #include "Bullet/Bullet.h"
@@ -75,6 +77,8 @@ public:
     // Camera management
     void handleCameraControls();
     void attachCameraToEntity(Entity* entity);
+
+    CameraController& getCameraController() { return camera; }
 
     // Input handling
     void handleBuildModeInput();

@@ -1,6 +1,8 @@
 #ifndef CAMERA_CONTROLLER_H
 #define CAMERA_CONTROLLER_H
 
+#include <iostream>
+
 #include "Entity/Entity.h"
 #include "raylib.h"
 #include "raymath.h"
