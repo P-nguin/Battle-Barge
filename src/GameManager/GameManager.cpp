@@ -10,6 +10,7 @@ GameManager::GameManager(int mapWidth, int mapHeight) {
     Instance = this;
     
     tilemap = std::make_unique<TileMap>(mapWidth, mapHeight);
+    currentMode = GameMode::PLAY;
 }
 
 void GameManager::createBullet(Vector2 position, float damage, float speed, float rotation, Texture2D* texture) {
@@ -65,41 +66,71 @@ void GameManager::removeTurret(Turret* turret) {
     );
 }
 
-void GameManager::handleTurretInput() {
-    for (auto& turret : turrets) {
-        if (IsKeyPressed(KEY_SPACE)) {
-            turret->interact(TurretCommands::FIRE);
-        }
-        if (IsKeyDown(KEY_LEFT)) {
-            turret->interact(TurretCommands::TURNLEFT);
-        }
-        if (IsKeyDown(KEY_RIGHT)) {
-            turret->interact(TurretCommands::TURNRIGHT);
-        }
-        if (IsKeyPressed(KEY_R)) {
-            turret->interact(TurretCommands::RELOAD);
-        }
-    }
-}
-
 void GameManager::updateTurrets(float deltaTime) {
     for (auto& turret : turrets) {
         turret->update(deltaTime);
     }
 }
 
-void GameManager::update(float deltaTime) {
-    handleTurretInput();
-    updateTurrets(deltaTime);
-    updateBullets(deltaTime);
+void GameManager::handleBuildModeInput() {
+    // Right-click to set tile to void
+    if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+        Vector2 mousePos = GetMousePosition();
+        int tileX = static_cast<int>(mousePos.x / Tile::TILE_SIZE);
+        int tileY = static_cast<int>(mousePos.y / Tile::TILE_SIZE);
+        
+        Tile* clickedTile = tilemap->getTileAtScreenPosition(mousePos);
+        
+        if (clickedTile && clickedTile->type != TileType::VOID) {
+            tilemap->removeTile(tileX, tileY);
+        }
+    }
+    
+    // Left-click to place stuff tile or show info
+    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+        Vector2 mousePos = GetMousePosition();
+        int tileX = static_cast<int>(mousePos.x / Tile::TILE_SIZE);
+        int tileY = static_cast<int>(mousePos.y / Tile::TILE_SIZE);
+        
+        Tile* clickedTile = tilemap->getTileAtScreenPosition(mousePos);
+        
+        if (clickedTile) {
+            if (clickedTile->type == TileType::VOID) {
+                tilemap->setTile(tileX, tileY, new StuffTile(tileX, tileY));
+            } else {
+                std::cout << clickedTile->getInfo() << std::endl;
+            }
+        }
+    }
+}
 
-    for (Entity& entity : entities) {
-        entity.update(deltaTime);
+void GameManager::update(float deltaTime) {
+    if (IsKeyPressed(KEY_B)) {
+        std::cout << "Switching GameMode to ";
+        if(currentMode == GameMode::PLAY) {
+            currentMode = GameMode::BUILD;
+            std::cout << "BUILD" << std::endl;
+        }
+        else if(currentMode == GameMode:: BUILD) {
+            currentMode = GameMode::PLAY;
+            std::cout << "PLAY" << std::endl;
+        }
+    }
+    else if (currentMode == GameMode::PLAY) {
+        updateTurrets(deltaTime);
+        updateBullets(deltaTime);
+
+        for (Entity& entity : entities) {
+            entity.update(deltaTime);
+        }
+    } else if (currentMode == GameMode::BUILD) {
+        handleBuildModeInput();
     }
 }
 
 void GameManager::render() {
     tilemap->render();
+    if(currentMode == GameMode::BUILD) tilemap->renderGrid();
     
     for (const auto& turret : turrets) {
         turret->render();

@@ -2,6 +2,7 @@
 #define TILE_H
 
 #include "raylib.h"
+#include <string>
 
 enum class TileType {
     VOID,
@@ -17,6 +18,7 @@ public:
 
     Tile(int x, int y, TileType type);
     virtual void render() const = 0;
+    virtual std::string getInfo() const;
 };
 
 class VoidTile : public Tile {
