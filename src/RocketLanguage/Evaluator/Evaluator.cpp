@@ -1,4 +1,5 @@
 #include "Evaluator.h"
+#include "Robots/Robot/Robot.h"
 
 namespace Rocket {
 
@@ -14,9 +15,7 @@ void Evaluator::setupCommands() {
             throw std::runtime_error("forward expects one number argument");
         }
         float distance = args[0].asNumber();
-        float angle = robot->getRotation() * DEG2RAD;
-        Vector2 move = { cosf(angle) * distance, sinf(angle) * distance };
-        robot->move(move);
+        robot->queueCommand(std::make_unique<MoveForwardCommand>(distance));
         return Value();
     };
 
@@ -24,7 +23,7 @@ void Evaluator::setupCommands() {
         if (args.size() != 1 || !args[0].isNumber()) {
             throw std::runtime_error("cw expects one number argument");
         }
-        robot->rotate(args[0].asNumber());
+        robot->queueCommand(std::make_unique<RotateCommand>(args[0].asNumber()));
         return Value();
     };
 
@@ -32,11 +31,11 @@ void Evaluator::setupCommands() {
         if (args.size() != 1 || !args[0].isNumber()) {
             throw std::runtime_error("ccw expects one number argument");
         }
-        robot->rotate(-args[0].asNumber());
+        robot->queueCommand(std::make_unique<RotateCommand>(-args[0].asNumber()));
         return Value();
     };
 
-    // Math operations
+    // Math operations remain unchanged
     commands["+"] = [](const std::vector<Value>& args) {
         if (args.empty()) return Value(0.0);
         double result = args[0].asNumber();
