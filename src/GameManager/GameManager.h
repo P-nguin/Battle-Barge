@@ -10,6 +10,7 @@
 #include "Bullet/Bullet.h"
 #include "Turret/Turret.h"
 #include "Entity/Enemy/Enemy.h"
+#include <bits/stdc++.h>
 
 class Enemy;
 
@@ -48,6 +49,7 @@ public:
     void cleanupBullets();
     void checkBulletCollisions();
 
+    std::vector<std::unique_ptr<Turret>>& getTurrets() { return turrets; }
     void addTurret(std::unique_ptr<Turret> turret);
     void removeTurret(Turret* turret);
     void updateTurrets(float deltaTime);

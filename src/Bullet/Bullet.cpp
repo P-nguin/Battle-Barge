@@ -8,7 +8,7 @@ Bullet::Bullet(const std::vector<Vector2>& vertices,
                float damage, 
                float speed, 
                Texture2D* texture)
-    : Entity(vertices, position, rotation, 1.0f, 0.0f, speed, false, texture),
+    : Entity(vertices, position, rotation, 1.0f, 0.0f, speed, texture),
       damage(damage),
       speed(speed), id{idCounter++}
 { std::cout << "Bullet created: " << id << std::endl; }

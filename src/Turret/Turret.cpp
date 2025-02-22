@@ -5,7 +5,7 @@ Turret::Turret(const std::vector<Vector2>& vertices, Vector2 position,
                float turnRate, float range, float fireRate,
                int ammo, float reloadTime, Texture2D* texture,
                AmmoType ammoType, TurretType turretType)
-    : Entity(vertices, position, forwardAngle, health, armour, 0, true, texture),
+    : InteractableEntity(vertices, position, forwardAngle, health, armour, 0, texture),
       forwardAngle(forwardAngle),
       localAngle(0.0f),
       globalAngle(forwardAngle),
@@ -66,9 +66,7 @@ void Turret::render() {
     } else {
         getHitBox().renderDebug(RED, BLUE);
         
-        if (interactable) {
-            interactableHitBox.renderDebug(PURPLE, BLANK);
-        }
+        interactableHitBox.renderDebug(PURPLE, BLANK);
 
         Vector2 pos = getPosition();
         Vector2 dir = { cosf(globalAngle * DEG2RAD), sinf(globalAngle * DEG2RAD) };
