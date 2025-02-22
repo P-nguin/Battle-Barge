@@ -57,9 +57,6 @@ public:
     void addEnemy(std::unique_ptr<Enemy> enemy);
     void removeEnemy(Enemy* enemy);
     void updateEnemies(float deltaTime);
-    
-    void update(float deltaTime);
-    void render();
 };
 
 #endif
