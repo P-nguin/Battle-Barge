@@ -3,7 +3,7 @@
 GameManager* GameManager::Instance = nullptr;
 
 GameManager::GameManager(int mapWidth, int mapHeight) 
-    : robotManager(RobotManager::getInstance())  // Get reference to RobotManager singleton
+    : robotManager(RobotManager::getInstance())
 {
     if ((Instance != nullptr)) {
         std::cout << "GameManager instance already exists!" << std::endl;
@@ -13,6 +13,51 @@ GameManager::GameManager(int mapWidth, int mapHeight)
     
     tilemap = std::make_unique<TileMap>(mapWidth, mapHeight);
     currentMode = GameMode::PLAY;
+
+    // Initalize Player
+    float playerWidth = 32;
+    float playerHeight = 32;
+    std::vector<Vector2> playerVertices = {
+        {0, 0},
+        {playerWidth, 0},
+        {playerWidth, playerHeight},
+        {0, playerHeight}
+    };
+    Vector2 playerPosition = {400, 300};
+    initializePlayer(playerVertices, playerPosition, 0.f, 10.f, 0.f, 64.0f, nullptr);
+}
+
+void GameManager::initializePlayer(const std::vector<Vector2>& vertices, Vector2 position, float rotation, float health, float armour, float speed, Texture2D* texture) {
+    player = std::make_unique<Player>(vertices, position, rotation, health, armour, speed, texture);
+    camera.setTrackedEntity(player.get());
+}
+
+void GameManager::handleCameraControls() {
+    // Check for robot clicks
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        Vector2 mousePos = camera.getScreenToWorld(GetMousePosition());
+        
+        // First check robots
+        for (const auto& robot : robotManager.getRobots()) {
+            if (robot->getHitBox().checkCollision(HitBox({mousePos}, mousePos, 0))) {
+                attachCameraToEntity(robot.get());
+                return;
+            }
+        }
+        
+        // If no robot was clicked, check if player was clicked
+        if (player && player->getHitBox().checkCollision(HitBox({mousePos}, mousePos, 0))) {
+            attachCameraToEntity(player.get());
+            return;
+        }
+    }
+}
+void GameManager::attachCameraToEntity(Entity* entity) {
+    camera.setTrackedEntity(entity);
+}
+
+void GameManager::handlePlayModeInput() {
+    handleCameraControls();
 }
 
 void GameManager::createBullet(Vector2 position, float damage, float speed, float rotation, Texture2D* texture) {
@@ -132,6 +177,8 @@ void GameManager::handleBuildModeInput() {
 }
 
 void GameManager::update(float deltaTime) {
+    camera.update(deltaTime);
+
     if (IsKeyPressed(KEY_B)) {
         std::cout << "Switching GameMode to ";
         if(currentMode == GameMode::PLAY) {
@@ -144,22 +191,28 @@ void GameManager::update(float deltaTime) {
         }
     }
     else if (currentMode == GameMode::PLAY) {
+        handlePlayModeInput();
+        player->update(deltaTime);
         updateTurrets(deltaTime);
-        updateBullets(deltaTime);
         updateEnemies(deltaTime);
         robotManager.updateRobots(deltaTime);
-
         for (Entity& entity : entities) {
             entity.update(deltaTime);
         }
+
+        updateBullets(deltaTime);
     } else if (currentMode == GameMode::BUILD) {
         handleBuildModeInput();
     }
 }
 
 void GameManager::render() {
+    BeginMode2D(camera.getCamera());
+
     tilemap->render();
-    if(currentMode == GameMode::BUILD) tilemap->renderGrid();
+    if(currentMode == GameMode::BUILD) {
+        tilemap->renderGrid();
+    }
     
     for (const auto& turret : turrets) {
         turret->render();
@@ -176,6 +229,8 @@ void GameManager::render() {
     for (const auto& enemy : enemies) {
         enemy->render();
     }
+
+    player->render();
 
     robotManager.renderRobots();
 }

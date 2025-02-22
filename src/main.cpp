@@ -19,18 +19,6 @@ int main() {
     Texture2D* turretTexture = new Texture2D(LoadTexture("Turrets/PlasmaTurret/SingleTurretLoaded.png"));
     Texture2D* bulletTexture = new Texture2D(LoadTexture("wabbit_alpha.png")); // For bullets
 
-    // Create and setup player
-    float playerWidth = 32;
-    float playerHeight = 32;
-    std::vector<Vector2> playerVertices = {
-        {0, 0},
-        {playerWidth, 0},
-        {playerWidth, playerHeight},
-        {0, playerHeight}
-    };
-    Vector2 playerPosition = {400, 300};
-    Player player(playerVertices, playerPosition, 0.0f, 10.0f, 0.0f, 64.0f, wabbitTexture);
-
     // Setup plasma turret
     float turretWidth = 40;
     float turretHeight = 40;
@@ -84,9 +72,6 @@ int main() {
     
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
-        
-        // Update player
-        player.update(deltaTime);
 
         // Update game manager (handles turret and bullet updates)
         gameManager.update(deltaTime);
@@ -109,7 +94,6 @@ int main() {
         ClearBackground(BLACK);
         
         gameManager.render();
-        player.render();
         
         DrawText(debugInfo, 10, 10, 20, WHITE);
         DrawText(TextFormat("FPS: %d", GetFPS()), 10, 100, 20, WHITE);

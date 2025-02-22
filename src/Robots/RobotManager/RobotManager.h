@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <memory>
+#include <algorithm>
 
 class Robot;
 
@@ -18,6 +19,8 @@ public:
     
     // Singleton pattern
     static RobotManager& getInstance();
+
+    const std::vector<std::unique_ptr<Robot>>& getRobots() const { return robots; }
     
 private:
     RobotManager() = default;
