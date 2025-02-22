@@ -14,6 +14,7 @@ public:
     void update(float deltaTime) override;
     void fire() override;
     void initializeBulletSpawns();
+
 };
 
 #endif

@@ -4,7 +4,7 @@
 
 Player::Player(const std::vector<Vector2>& vertices, Vector2 position, float rotation,
                float health, float armour, float speed, Texture2D* texture)
-    : Entity(vertices, position, rotation, health, armour, speed, false, texture)
+    : Entity(vertices, position, rotation, health, armour, speed, texture)
 { }
 
 void Player::handleMovement(float deltaTime)
@@ -45,6 +45,27 @@ void Player::render() {
     }
 }
 
+bool Player::checkInteract(InteractableEntity* &entity) {
+    for (auto& turret : GameManager::Instance->getTurrets()) {
+        if (turret->getHitBox().checkCollision(hitBox)) {
+            entity = turret.get();
+            return true;
+        }
+    }
+    entity = nullptr;
+    return false;
+}
+
 void Player::update(float deltaTime) {
     handleMovement(deltaTime);
+
+    if (IsKeyPressed(KEY_F)) {
+        InteractableEntity* turret = nullptr;
+        if (checkInteract(turret)){
+            std::cout << "Interacting with turret: " << turret << std::endl;
+            turret->interact(TurretCommands::FIRE);
+        } else {
+            std::cout << "No interactable entity found" << std::endl;
+        }
+    }
 }

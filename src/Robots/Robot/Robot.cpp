@@ -7,7 +7,7 @@ Robot::Robot(const std::vector<Vector2>& vertices,
             float armour,
             float speed,
             float maxEnergy)
-    : Entity(vertices, position, rotation, health, armour, speed, false, nullptr),
+    : Entity(vertices, position, rotation, health, armour, speed, nullptr),
       rotationSpeed(180.0f),
       minEnergyThreshold(10.0f),
       currentState(RobotState::POWERED_OFF),
