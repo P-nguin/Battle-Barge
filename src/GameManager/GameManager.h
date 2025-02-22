@@ -12,6 +12,8 @@
 #include "Turret/Turret.h"
 #include "Entity/Enemy/Enemy.h"
 
+class Enemy;
+
 class GameManager {
 public:
     static GameManager* Instance;
@@ -24,7 +26,7 @@ private:
     std::vector<std::unique_ptr<Enemy>> enemies;
     
 public:
-    const float HIT_COOLDOWN = 0.5f;
+    const float HIT_COOLDOWN = 1.0f;
 
 
     GameManager(int mapWidth, int mapHeight);

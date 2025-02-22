@@ -4,6 +4,7 @@
 #include "Entity/Entity.h"
 #include "raylib.h"
 #include <raymath.h>
+#include <iostream>
 
 class Bullet : public Entity {
 private:

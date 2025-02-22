@@ -8,20 +8,22 @@ Enemy::Enemy(const std::vector<Vector2>& vertices, Vector2 position, float rotat
       targetPosition(targetPosition)
 { }
 
-void Enemy::takeDamage(Bullet bullet) {
+void Enemy::takeDamage(Bullet *bullet) {
     
-    if (recentBulletHitCooldowns.find(bullet.getId()) != recentBulletHitCooldowns.end()) {
-        std::cout << "dmg on cooldown" << std::endl;
-        return;
+    if (recentBulletHitCooldowns.find(bullet->getId()) != recentBulletHitCooldowns.end()) {
+        if (recentBulletHitCooldowns[bullet->getId()] > 0.0f){
+            std::cout << "dmg on cooldown" << std::endl;
+            return; 
+        }
     } 
-    std::cout << "took damage" << std::endl;
-    health -= bullet.getDamage();
+    // std::cout << "took damage" << std::endl;
+    health -= bullet->getDamage();
     if (health <= 0) {
-        std::cout << "Enemy destroyed" << std::endl;
-        // Destroy enemy
+        // std::cout << "Enemy destroyed" << std::endl;
         GameManager::Instance->removeEnemy(this);
+        return;
     }
-    recentBulletHitCooldowns[bullet.getId()] = GameManager::Instance->HIT_COOLDOWN;
+    recentBulletHitCooldowns[bullet->getId()] = GameManager::Instance->HIT_COOLDOWN;
 }
 
 void Enemy::update(float deltaTime) {
@@ -63,3 +65,4 @@ void Enemy::render() {
         getHitBox().renderDebug(RED, BLUE);
     }
 }
+

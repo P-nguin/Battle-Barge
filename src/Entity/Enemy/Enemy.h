@@ -31,7 +31,7 @@ class Enemy : public Entity {
 
         float getDamage() const { return damage; }
 
-        void takeDamage(Bullet bullet);
+        void takeDamage(Bullet *bullet);
 
         void update(float deltaTime) override;
         void render() override;

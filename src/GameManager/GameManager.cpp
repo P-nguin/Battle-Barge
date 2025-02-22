@@ -34,19 +34,22 @@ void GameManager::updateBullets(float deltaTime) {
     for (auto& bullet : bullets) {
         bullet->update(deltaTime);
     }
+    checkBulletCollisions();
     cleanupBullets();
 }
 
 void GameManager::checkBulletCollisions() {
+    if (bullets.empty() || enemies.empty()) {
+        return;
+    }
     for (auto& bullet : bullets) {
         for (auto& enemy : enemies) {
             if (bullet->getHitBox().checkCollision(enemy->getHitBox())) {
-                std::cout << "Taking damage" << std::endl;
-                enemy->takeDamage(*bullet);
+                // std::cout << "interscting" << std::endl;
+                enemy->takeDamage(bullet.get());
             }
         }
     }
-    std::cout << std::endl;
 }
 
 void GameManager::cleanupBullets() {
@@ -124,6 +127,8 @@ void GameManager::updateEnemies(float deltaTime){
 
 
 void GameManager::update(float deltaTime) {
+    
+
     handleTurretInput();
     updateTurrets(deltaTime);
     updateBullets(deltaTime);
@@ -132,11 +137,6 @@ void GameManager::update(float deltaTime) {
     for (Entity& entity : entities) {
         entity.update(deltaTime);
     }
-
-    if (enemies.size() > 0 && bullets.size() > 0){
-        checkBulletCollisions();
-    }
-
 }
 
 void GameManager::render() {

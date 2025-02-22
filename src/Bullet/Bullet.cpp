@@ -11,7 +11,7 @@ Bullet::Bullet(const std::vector<Vector2>& vertices,
     : Entity(vertices, position, rotation, 1.0f, 0.0f, speed, false, texture),
       damage(damage),
       speed(speed), id{idCounter++}
-{}
+{ std::cout << "Bullet created: " << id << std::endl; }
 
 void Bullet::update(float deltaTime) {
     float rotationRad = getRotation() * DEG2RAD;
