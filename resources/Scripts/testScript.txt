@@ -1,0 +1,4 @@
+(forward 50)
+(cw 90)
+(forward 50)
+(cw (+ 45 45))

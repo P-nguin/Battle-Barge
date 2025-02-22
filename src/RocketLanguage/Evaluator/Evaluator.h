@@ -1,13 +1,14 @@
 #ifndef EVALUATOR_H
 #define EVALUATOR_H
 
-#include "../Parser/Parser.h"
-#include "Robot/Robot.h"
 #include <unordered_map>
 #include <functional>
 #include "raylib.h"
 #include "raymath.h"
+#include "../Parser/Parser.h"
+#include "Robots/RobotManager/RobotManager.h"
 
+class Robot;
 
 namespace Rocket {
 

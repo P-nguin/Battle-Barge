@@ -2,7 +2,9 @@
 
 GameManager* GameManager::Instance = nullptr;
 
-GameManager::GameManager(int mapWidth, int mapHeight) {
+GameManager::GameManager(int mapWidth, int mapHeight) 
+    : robotManager(RobotManager::getInstance())  // Get reference to RobotManager singleton
+{
     if ((Instance != nullptr)) {
         std::cout << "GameManager instance already exists!" << std::endl;
         return;
@@ -14,63 +16,62 @@ GameManager::GameManager(int mapWidth, int mapHeight) {
 }
 
 void GameManager::createBullet(Vector2 position, float damage, float speed, float rotation, Texture2D* texture) {
+    // Create bullet hitbox
+    float bulletSize = 4.0f;  // Small bullet size
     std::vector<Vector2> bulletVertices = {
-        {-2, -2},
-        {2, -2},
-        {2, 2},
-        {-2, 2}
+        {-bulletSize/2, -bulletSize/2},
+        {bulletSize/2, -bulletSize/2},
+        {bulletSize/2, bulletSize/2},
+        {-bulletSize/2, bulletSize/2}
     };
 
-    bullets.push_back(std::make_unique<Bullet>(
+    auto bullet = std::make_unique<Bullet>(
         bulletVertices,
         position,
         rotation,
         damage,
         speed,
         texture
-    ));
+    );
+    
+    bullets.push_back(std::move(bullet));
 }
 
 void GameManager::updateBullets(float deltaTime) {
+    // Update bullet positions
     for (auto& bullet : bullets) {
         bullet->update(deltaTime);
     }
+
+    // Clean up bullets that are out of bounds or have hit something
     cleanupBullets();
     checkBulletCollisions();
-}
-
-void GameManager::checkBulletCollisions() {
-    if (bullets.empty() || enemies.empty()) {
-        return;
-    }
-    std::vector<Enemy*> enemiesToRemove;
-    for (auto& bullet : bullets) {
-        for (auto& enemy : enemies) {
-            if (bullet->getHitBox().checkCollision(enemy->getHitBox())) {
-                // std::cout << "interscting" << std::endl;
-                if (enemy->takeDamage(bullet.get())){
-                    enemiesToRemove.push_back(enemy.get());
-                }
-            }
-        }
-    }
-
-    for (auto& enemy : enemiesToRemove) {
-        removeEnemy(enemy);
-    }
 }
 
 void GameManager::cleanupBullets() {
     bullets.erase(
         std::remove_if(bullets.begin(), bullets.end(),
-            [](const std::unique_ptr<Bullet>& bullet) {
+            [](const auto& bullet) {
                 Vector2 pos = bullet->getPosition();
-                return pos.x < 0 || pos.x > GetScreenWidth() || 
+                return pos.x < 0 || pos.x > GetScreenWidth() ||
                        pos.y < 0 || pos.y > GetScreenHeight();
             }
         ),
         bullets.end()
     );
+}
+
+void GameManager::checkBulletCollisions() {
+    // Iterate through bullets and check collisions with enemies
+    for (auto& bullet : bullets) {
+        for (auto& enemy : enemies) {
+            if (bullet->getHitBox().checkCollision(enemy->getHitBox())) {
+                if (enemy->takeDamage(bullet.get())) {
+                    removeEnemy(enemy.get());
+                }
+            }
+        }
+    }
 }
 
 void GameManager::addTurret(std::unique_ptr<Turret> turret) {
@@ -80,9 +81,7 @@ void GameManager::addTurret(std::unique_ptr<Turret> turret) {
 void GameManager::removeTurret(Turret* turret) {
     turrets.erase(
         std::remove_if(turrets.begin(), turrets.end(),
-            [turret](const std::unique_ptr<Turret>& t) {
-                return t.get() == turret;
-            }
+            [turret](const auto& t) { return t.get() == turret; }
         ),
         turrets.end()
     );
@@ -94,72 +93,39 @@ void GameManager::updateTurrets(float deltaTime) {
     }
 }
 
-
-void GameManager::addEnemy(std::unique_ptr<Enemy> enemy){
+void GameManager::addEnemy(std::unique_ptr<Enemy> enemy) {
     enemies.push_back(std::move(enemy));
 }
 
-void GameManager::removeEnemy(Enemy* enemy){
+void GameManager::removeEnemy(Enemy* enemy) {
     enemies.erase(
         std::remove_if(enemies.begin(), enemies.end(),
-            [enemy](const std::unique_ptr<Enemy>& e){
-                return e.get() == enemy;
-            }
+            [enemy](const auto& e) { return e.get() == enemy; }
         ),
         enemies.end()
     );
 }
 
-void GameManager::updateEnemies(float deltaTime){
-    for (auto& enemy : enemies){
+void GameManager::updateEnemies(float deltaTime) {
+    for (auto& enemy : enemies) {
         enemy->update(deltaTime);
     }
 }
 
-void GameManager::handleTurretInput() {
-    for (auto& turret : turrets) {
-        if (IsKeyPressed(KEY_SPACE)) {
-            turret->interact(TurretCommands::FIRE);
-        }
-        if (IsKeyDown(KEY_LEFT)) {
-            turret->interact(TurretCommands::TURNLEFT);
-        }
-        if (IsKeyDown(KEY_RIGHT)) {
-            turret->interact(TurretCommands::TURNRIGHT);
-        }
-        if (IsKeyPressed(KEY_R)) {
-            turret->interact(TurretCommands::RELOAD);
-        }
-    }
-}
-
 void GameManager::handleBuildModeInput() {
-    // Right-click to set tile to void
-    if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         Vector2 mousePos = GetMousePosition();
-        int tileX = static_cast<int>(mousePos.x / Tile::TILE_SIZE);
-        int tileY = static_cast<int>(mousePos.y / Tile::TILE_SIZE);
-        
         Tile* clickedTile = tilemap->getTileAtScreenPosition(mousePos);
-        
-        if (clickedTile && clickedTile->type != TileType::VOID) {
-            tilemap->removeTile(tileX, tileY);
-        }
-    }
-    
-    // Left-click to place stuff tile or show info
-    if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-        Vector2 mousePos = GetMousePosition();
-        int tileX = static_cast<int>(mousePos.x / Tile::TILE_SIZE);
-        int tileY = static_cast<int>(mousePos.y / Tile::TILE_SIZE);
-        
-        Tile* clickedTile = tilemap->getTileAtScreenPosition(mousePos);
-        
         if (clickedTile) {
+            // For now, just toggle between VOID and STUFF
             if (clickedTile->type == TileType::VOID) {
+                int tileX = static_cast<int>(mousePos.x) / Tile::TILE_SIZE;
+                int tileY = static_cast<int>(mousePos.y) / Tile::TILE_SIZE;
                 tilemap->setTile(tileX, tileY, new StuffTile(tileX, tileY));
             } else {
-                std::cout << clickedTile->getInfo() << std::endl;
+                int tileX = static_cast<int>(mousePos.x) / Tile::TILE_SIZE;
+                int tileY = static_cast<int>(mousePos.y) / Tile::TILE_SIZE;
+                tilemap->setTile(tileX, tileY, new VoidTile(tileX, tileY));
             }
         }
     }
@@ -172,18 +138,16 @@ void GameManager::update(float deltaTime) {
             currentMode = GameMode::BUILD;
             std::cout << "BUILD" << std::endl;
         }
-        else if(currentMode == GameMode:: BUILD) {
+        else if(currentMode == GameMode::BUILD) {
             currentMode = GameMode::PLAY;
             std::cout << "PLAY" << std::endl;
         }
     }
     else if (currentMode == GameMode::PLAY) {
-    
-
-    handleTurretInput();
-    updateTurrets(deltaTime);
-    updateBullets(deltaTime);
-    updateEnemies(deltaTime);
+        updateTurrets(deltaTime);
+        updateBullets(deltaTime);
+        updateEnemies(deltaTime);
+        robotManager.updateRobots(deltaTime);
 
         for (Entity& entity : entities) {
             entity.update(deltaTime);
@@ -209,7 +173,9 @@ void GameManager::render() {
         bullet->render();
     }
 
-    for (const auto& enemy : enemies){
+    for (const auto& enemy : enemies) {
         enemy->render();
     }
+
+    robotManager.renderRobots();
 }

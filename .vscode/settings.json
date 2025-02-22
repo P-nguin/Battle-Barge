@@ -115,6 +115,8 @@
     "text_encoding": "cpp",
     "thread": "cpp",
     "typeindex": "cpp",
-    "valarray": "cpp"
+    "valarray": "cpp",
+    "__tree": "cpp",
+    "queue": "cpp"
   }
 }
