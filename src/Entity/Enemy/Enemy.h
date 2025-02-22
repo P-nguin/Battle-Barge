@@ -10,6 +10,8 @@
 #include "../../Bullet/Bullet.h"
 #include "../Entity.h"
 
+class Bullet;
+class GameManager;
 
 class Enemy : public Entity {
 

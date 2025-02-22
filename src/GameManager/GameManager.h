@@ -4,15 +4,18 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-
 #include "Map/TileMap.h"
 #include "Entity/Entity.h"
 #include "Bullet/Bullet.h"
 #include "Turret/Turret.h"
 #include "Entity/Enemy/Enemy.h"
 #include "Robots/RobotManager/RobotManager.h"
+#include "Robots/Robot/Robot.h"
+#include "Player/Player.h"
+#include "CameraController/CameraController.h"
 
 class Enemy;
+class Player;
 
 enum class GameMode {
     PLAY,
@@ -29,8 +32,9 @@ private:
     std::vector<std::unique_ptr<Bullet>> bullets;
     std::vector<std::unique_ptr<Turret>> turrets;
     std::vector<std::unique_ptr<Enemy>> enemies;
-    RobotManager& robotManager;  // Reference to RobotManager singleton
-
+    RobotManager& robotManager;
+    std::unique_ptr<Player> player;
+    CameraController camera;
     GameMode currentMode;
     
 public:
@@ -41,6 +45,12 @@ public:
 
     TileMap* getTileMap() { return tilemap.get(); }
     RobotManager& getRobotManager() { return robotManager; }
+    Player* getPlayer() { return player.get(); }
+    const CameraController& getCamera() const { return camera; }
+
+    void initializePlayer(const std::vector<Vector2>& vertices, Vector2 position, 
+                         float rotation, float health, float armour, 
+                         float speed, Texture2D* texture);
 
     void update(float deltaTime);
     void render();
@@ -62,8 +72,13 @@ public:
     void removeEnemy(Enemy* enemy);
     void updateEnemies(float deltaTime);
 
+    // Camera management
+    void handleCameraControls();
+    void attachCameraToEntity(Entity* entity);
+
     // Input handling
     void handleBuildModeInput();
+    void handlePlayModeInput();
 };
 
 #endif
