@@ -42,13 +42,20 @@ void GameManager::checkBulletCollisions() {
     if (bullets.empty() || enemies.empty()) {
         return;
     }
+    std::vector<Enemy*> enemiesToRemove;
     for (auto& bullet : bullets) {
         for (auto& enemy : enemies) {
             if (bullet->getHitBox().checkCollision(enemy->getHitBox())) {
                 // std::cout << "interscting" << std::endl;
-                enemy->takeDamage(bullet.get());
+                if (enemy->takeDamage(bullet.get())){
+                    enemiesToRemove.push_back(enemy.get());
+                }
             }
         }
+    }
+
+    for (auto& enemy : enemiesToRemove) {
+        removeEnemy(enemy);
     }
 }
 

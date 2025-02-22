@@ -8,22 +8,23 @@ Enemy::Enemy(const std::vector<Vector2>& vertices, Vector2 position, float rotat
       targetPosition(targetPosition)
 { }
 
-void Enemy::takeDamage(Bullet *bullet) {
+bool Enemy::takeDamage(Bullet *bullet) {
     
     if (recentBulletHitCooldowns.find(bullet->getId()) != recentBulletHitCooldowns.end()) {
         if (recentBulletHitCooldowns[bullet->getId()] > 0.0f){
             std::cout << "dmg on cooldown" << std::endl;
-            return; 
+            return false;
         }
     } 
     // std::cout << "took damage" << std::endl;
     health -= bullet->getDamage();
     if (health <= 0) {
         // std::cout << "Enemy destroyed" << std::endl;
-        GameManager::Instance->removeEnemy(this);
-        return;
+        // GameManager::Instance->removeEnemy(this);
+        return true;
     }
     recentBulletHitCooldowns[bullet->getId()] = GameManager::Instance->HIT_COOLDOWN;
+    return false;
 }
 
 void Enemy::update(float deltaTime) {
@@ -45,11 +46,16 @@ void Enemy::update(float deltaTime) {
     }
     
     // Handle hit cooldown
+    std::vector<int> idsToRemove;
     for (auto& [id, cooldown] : recentBulletHitCooldowns) {
         recentBulletHitCooldowns[id] -= deltaTime;
         if (recentBulletHitCooldowns[id] <= 0.0f) {
-            recentBulletHitCooldowns.erase(id);
+            idsToRemove.push_back(id);
         }
+    }
+
+    for (int id : idsToRemove) {
+        recentBulletHitCooldowns.erase(id);
     }
 
 }
