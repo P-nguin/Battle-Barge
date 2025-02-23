@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include <bits/stdc++.h>
+#include <algorithm>
 
 #include "Map/TileMap.h"
 #include "Entity/Entity.h"

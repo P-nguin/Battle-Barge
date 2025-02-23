@@ -4,7 +4,6 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
-#include <bits/stdc++.h>
 
 class Robot;
 
