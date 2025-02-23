@@ -25,19 +25,11 @@ void Player::handleMovement(float deltaTime)
     move(moveDirection);
 
     // Vector2 relMousePos = GetWorldToScreen2D(getPosition(), CameraController::Instance->getCamera());
-    Vector2 relMousePos = GetScreenToWorld2D(GetMousePosition(), GameManager::Instance->getCameraController().getCamera());
+    Vector2 relMousePos = GameManager::Instance->getCameraController().getScreenToWorld(GetMousePosition());
     Vector2 lookDir = Vector2Subtract(relMousePos, getPosition());
-    
-    // if (relMousePos.x < getPosition().x) {
-    //     rotation += 180;
-    // }
-    // std::cout << rotation << std::endl;
-    relMousePos = GameManager::Instance->getCameraController().getScreenToWorld(GetMousePosition());
-    lookDir = Vector2Subtract(relMousePos, getPosition());
-    std::cout << lookDir.x << " " << lookDir.y << std::endl;
-    std::cout << getPosition().x << " " << getPosition().y << std::endl;
-    std::cout << std::endl;
-    
+    if (relMousePos.x < getPosition().x) {
+        rotation += 180;
+    }
     rotation = atan((lookDir.y)/(lookDir.x)) * RAD2DEG;
     hitBox.setRotation(rotation);
 
@@ -58,24 +50,56 @@ void Player::render() {
 bool Player::checkInteract(InteractableEntity* &entity) {
     for (auto& turret : GameManager::Instance->getTurrets()) {
         if (turret->getHitBox().checkCollision(hitBox)) {
+            controllingEntity = turret.get();
             entity = turret.get();
             return true;
         }
     }
+    controllingEntity = nullptr;
     entity = nullptr;
     return false;
 }
 
 void Player::update(float deltaTime) {
-    handleMovement(deltaTime);
+    handleInput(deltaTime);    
+}
 
-    if (IsKeyPressed(KEY_F)) {
-        InteractableEntity* turret = nullptr;
-        if (checkInteract(turret)){
-            std::cout << "Interacting with turret: " << turret << std::endl;
-            turret->interact(TurretCommands::FIRE);
-        } else {
-            std::cout << "No interactable entity found" << std::endl;
+void Player::handleInput(float deltaTime) {
+    if (controllingEntity){
+        if (IsKeyPressed(KEY_F)) {
+            std::cout << "Detach from entity" << std::endl;
+            controllingEntity = nullptr;
+        }
+
+        if (IsKeyPressed(KEY_R)) {
+            // std::cout << "Reload" << std::endl;
+            controllingEntity->interact(TurretCommands::RELOAD);
+        }
+        if (IsKeyPressed(KEY_E)) {
+            // std::cout << "Fire" << std::endl;
+            controllingEntity->interact(TurretCommands::FIRE);
+        }
+
+        if (IsKeyDown(KEY_A)) {
+            // std::cout << "Turn left" << std::endl;
+            controllingEntity->interact(TurretCommands::TURNLEFT);
+        }
+        if (IsKeyDown(KEY_D)) {
+            // std::cout << "Turn right" << std::endl;
+            controllingEntity->interact(TurretCommands::TURNRIGHT);
+        }
+
+
+    } else {
+        handleMovement(deltaTime);
+        if (IsKeyPressed(KEY_F)) {
+            InteractableEntity* turret = nullptr;
+            if (checkInteract(turret)){
+                std::cout << "Interacting with turret: " << turret << std::endl;
+            } else {
+                std::cout << "No interactable entity found" << std::endl;
+            }
         }
     }
+    
 }

@@ -59,7 +59,6 @@ class InteractableEntity : public Entity {
         virtual void setRotation(float rotation) override;
         virtual void move(Vector2 offset) override;
         virtual void rotate(float angle) override;
-
         virtual void interact(TurretCommands cmd) = 0;
 };
 
