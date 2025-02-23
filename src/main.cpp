@@ -37,7 +37,7 @@ int main() {
         0.0f,                    // forward angle
         100.0f,                  // health
         5.0f,                    // armor
-        5.0f,                    // turn rate
+        15.0f,                    // turn rate
         200.0f,                  // range
         1.0f,                    // fire rate
         10,                      // ammo
