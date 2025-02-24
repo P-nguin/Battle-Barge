@@ -7,9 +7,11 @@
 #include "GameManager/GameManager.h"
 #include "Turret/Turret.h"
 #include "CameraController/CameraController.h"
+#include "HitBox/HitBox.h"
 
 class Player : public Entity {
     private:
+        const float INTERACT_DISTANCE = 30.0f;
         InteractableEntity* controllingEntity = nullptr;
         bool checkInteract(InteractableEntity* &entity);
     public:

@@ -32,7 +32,7 @@ void Enemy::update(float deltaTime) {
     Vector2 moveDirection = Vector2Normalize(Vector2Subtract(targetPosition, getPosition()));
     moveDirection = Vector2Scale(moveDirection, speed * deltaTime);
     move(moveDirection);
-    rotation = atan((targetPosition.y - getPosition().y) / (targetPosition.x - getPosition().x)) * RAD2DEG;
+    rotation = targetPosition.x - getPosition().x == 0 ? 0.0 : atan((targetPosition.y - getPosition().y) / (targetPosition.x - getPosition().x)) * RAD2DEG;
     if (targetPosition.x < getPosition().x) {
         rotation += 180;
     }

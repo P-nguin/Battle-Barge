@@ -26,6 +26,7 @@ class Entity {
         // Position getters/setters
         Vector2 getPosition() const;
         float getRotation() const;
+        Vector2 getRotationVector() const;
         float getHealth() const;
         float getArmour() const;
         Texture2D* getTexture() const;

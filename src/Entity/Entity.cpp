@@ -30,6 +30,11 @@ float Entity::getArmour() const { return armour; }
 Texture2D* Entity::getTexture() const { return texture; }
 const HitBox& Entity::getHitBox() const { return hitBox; }
 
+Vector2 Entity::getRotationVector() const {
+    float angle = hitBox.getRotation();
+    return Vector2Normalize({ cos(angle * DEG2RAD), sin(angle * DEG2RAD) });
+}
+
 void Entity::setPosition(Vector2 position) { 
     hitBox.setPosition(position);
 }

@@ -27,10 +27,13 @@ void Player::handleMovement(float deltaTime)
     // Vector2 relMousePos = GetWorldToScreen2D(getPosition(), CameraController::Instance->getCamera());
     Vector2 relMousePos = GameManager::Instance->getCameraController().getScreenToWorld(GetMousePosition());
     Vector2 lookDir = Vector2Subtract(relMousePos, getPosition());
+
+    rotation = lookDir.x == 0 ? rotation = 0.0 : atan((lookDir.y)/(lookDir.x)) * RAD2DEG;
+    
     if (relMousePos.x < getPosition().x) {
         rotation += 180;
     }
-    rotation = atan((lookDir.y)/(lookDir.x)) * RAD2DEG;
+    
     hitBox.setRotation(rotation);
 
 }
@@ -49,7 +52,8 @@ void Player::render() {
 
 bool Player::checkInteract(InteractableEntity* &entity) {
     for (auto& turret : GameManager::Instance->getTurrets()) {
-        if (turret->getHitBox().checkCollision(hitBox)) {
+        HitBox forwardHitBox = HitBox::rayHitBox( getPosition(), getRotationVector(), INTERACT_DISTANCE);
+        if (turret->getHitBox().checkCollision(forwardHitBox)) {
             controllingEntity = turret.get();
             entity = turret.get();
             return true;
@@ -65,6 +69,9 @@ void Player::update(float deltaTime) {
 }
 
 void Player::handleInput(float deltaTime) {
+
+    // Whenever F is clicked, cast a ray in front.
+
     if (controllingEntity){
         if (IsKeyPressed(KEY_F)) {
             std::cout << "Detach from entity" << std::endl;

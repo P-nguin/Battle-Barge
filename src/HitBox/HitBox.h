@@ -42,6 +42,9 @@ public:
     const std::vector<Vector2>& getVertices() const { return vertices; }
 
     void renderDebug(Color outlineColor, Color fillColor) const;
+
+    static HitBox rayHitBox(const Vector2& point, const Vector2& direction, const float distance);
+    bool checkRayCollision(const Vector2& point, const Vector2& direction, const float distance) const;
 };
 
 #endif
