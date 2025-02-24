@@ -107,3 +107,33 @@ void HitBox::renderDebug(Color outlineColor, Color fillColor) const {
     
     DrawCircleV(position, 2.0f, RED);
 }
+
+
+HitBox HitBox::rayHitBox(const Vector2& point, const Vector2& direction, const float distance) {
+    std::vector<Vector2> rayPoints = { point, Vector2Add(point, Vector2Scale(Vector2Normalize(direction), distance))};
+    Vector2 center = Vector2Scale(Vector2Add(rayPoints[0], rayPoints[1]), 1/2.0);
+    
+    // std::cout << point.x << " " << point.y << std::endl;
+    // std::cout << direction.x << " " << direction.y << std::endl;
+
+    std::cout << "Center: " << center.x << " " << center.y << std::endl;
+
+    HitBox rayHitBox = HitBox(rayPoints, center, 0);
+    return rayHitBox;
+}
+
+bool HitBox::checkRayCollision(const Vector2& point, const Vector2& direction, const float distance) const {
+
+    Vector2 center = Vector2Scale(Vector2Add(point, Vector2Scale(Vector2Normalize(direction), distance)), 1/2.0);
+    std::vector<Vector2> rayPoints = { point, Vector2Add(point, Vector2Scale(Vector2Normalize(direction), distance))};
+    // std::cout << point.x << " " << point.y << std::endl;
+    // std::cout << direction.x << " " << direction.y << std::endl;
+
+    std::cout << "Center: " << center.x << " " << center.y << std::endl;
+
+    HitBox rayHitBox = HitBox(rayPoints, center, 0);
+    rayHitBox.renderDebug(RED, BLUE);
+
+    return this->checkCollision(rayHitBox);
+
+}
