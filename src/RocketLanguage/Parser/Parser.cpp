@@ -6,6 +6,10 @@ std::string NumberExpr::toString() const {
     return std::to_string(value);
 }
 
+std::string StringExpr::toString() const {
+    return "\"" + value + "\"";
+}
+
 std::string CommandExpr::toString() const {
     std::string result = "(" + name;
     for (const auto& arg : arguments) {
@@ -38,6 +42,8 @@ ExprPtr Parser::parseAtom() {
     switch (token.type) {
         case TokenType::NUMBER:
             return std::make_shared<NumberExpr>(std::stod(token.value));
+        case TokenType::STRING:
+            return std::make_shared<StringExpr>(token.value);
         case TokenType::SYMBOL:
             return std::make_shared<CommandExpr>(token.value, std::vector<ExprPtr>());
         case TokenType::BINDING:

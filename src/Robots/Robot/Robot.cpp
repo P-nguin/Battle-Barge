@@ -1,36 +1,28 @@
 #include "Robot.h"
+#include <iostream>
 
 Robot::Robot(const std::vector<Vector2>& vertices,
-            Vector2 position,
-            float rotation,
-            float health,
-            float armour,
-            float speed,
-            float maxEnergy)
-    : Entity(vertices, position, rotation, health, armour, speed, nullptr),
-      rotationSpeed(180.0f),
-      minEnergyThreshold(10.0f),
-      currentState(RobotState::POWERED_OFF),
-      instructionPointer(0),
-      isCodeRunning(false),
-      isMoving(false),
-      moveTarget{0, 0},
-      remainingDistance(0),
-      isRotating(false),
-      targetRotation(0),
-      remainingRotation(0)
+             Vector2 position,
+             float rotation,
+             float health,
+             float armour,
+             float speed,
+             float maxEnergy)
+    : Entity(vertices, position, rotation, health, armour, speed, nullptr)
 {}
-
-Robot::~Robot() {}
 
 bool Robot::powerOn() {
     if (currentState == RobotState::POWERED_OFF) {
         currentState = RobotState::IDLE;
         onCodeStart();
-        if (script) {
+        
+        // If script exists and is not already running, start it
+        if (script && !isCodeRunning) {
             isCodeRunning = true;
+            instructionPointer = 0;
             executeNextInstruction();
         }
+        
         return true;
     }
     return false;
@@ -40,6 +32,12 @@ bool Robot::powerOff() {
     if (currentState != RobotState::POWERED_OFF) {
         currentState = RobotState::POWERED_OFF;
         isCodeRunning = false;
+        
+        // Clear any ongoing command
+        if (currentCommand) {
+            currentCommand.reset();
+        }
+        
         onCodeStop();
         return true;
     }
@@ -49,20 +47,94 @@ bool Robot::powerOff() {
 void Robot::setScript(std::shared_ptr<Script> newScript) {
     script = newScript;
     instructionPointer = 0;
+    
+    // If powered on and not running a script, start it
     if (isPowered() && !isCodeRunning && script) {
         isCodeRunning = true;
         executeNextInstruction();
     }
 }
 
+void Robot::setCurrentCommand(std::unique_ptr<RobotCommand> command) {
+    // Ensure we're not overwriting an existing command
+    if (currentCommand) {
+        throw std::runtime_error("Cannot set new command while another is in progress");
+    }
+
+    // Add this robot as an observer to the command
+    command->addObserver(this);
+    
+    // Set the current command
+    currentCommand = std::move(command);
+    
+    // Execute the command
+    currentCommand->execute(this);
+}
+
+void Robot::onCommandCompleted(Robot* robot, RobotCommand* completedCommand) {
+    std::cout << "Command Completed - Robot ID: " << getId() << std::endl;
+    
+    // Verify this completion is for our current command
+    if (currentCommand.get() == completedCommand) {
+        std::cout << "  Clearing current command and moving to next instruction" << std::endl;
+        
+        // Important: Reset the current command BEFORE trying to execute the next instruction
+        currentCommand.reset();
+        
+        // Only move to the next instruction if this is the current robot
+        if (robot == this && isCodeRunning) {
+            std::cout << "  Moving to instruction #" << (instructionPointer + 1) << std::endl;
+            
+            // Move to the next instruction
+            instructionPointer++;
+            
+            // Try to execute the next instruction
+            executeNextInstruction();
+        }
+    } else {
+        std::cout << "  WARNING: Completed command is not the current command!" << std::endl;
+    }
+}
+
+void Robot::onCommandFailed(Robot* robot, RobotCommand* failedCommand, const std::string& errorMessage) {
+    // Handle command failure
+    std::cerr << "Command failed: " << errorMessage << std::endl;
+    
+    // Stop script execution or take appropriate error handling action
+    if (currentCommand.get() == failedCommand) {
+        currentCommand.reset();
+        isCodeRunning = false;
+        currentState = RobotState::ERROR;
+    }
+}
+
 void Robot::executeNextInstruction() {
-    if (!script || !isCodeRunning || !isReadyForNextCommand()) {
+    std::cout << "Execute Next Instruction:" << std::endl;
+    std::cout << "  Script exists: " << (script ? "Yes" : "No") << std::endl;
+    std::cout << "  Is Code Running: " << isCodeRunning << std::endl;
+    std::cout << "  Current Command: " << (currentCommand ? "Exists" : "NULL") << std::endl;
+    std::cout << "  Instruction Pointer: " << instructionPointer << std::endl;
+
+    // If there's no script, code isn't running, or there's already a command in progress,
+    // don't try to execute the next instruction
+    if (!script || !isCodeRunning) {
+        std::cout << "  Execution blocked: " 
+                 << (!script ? "No script" : "Code not running")
+                 << std::endl;
+        return;
+    }
+
+    // If there's a command in progress, just return and wait for it to complete
+    if (currentCommand) {
+        std::cout << "  Command in progress, waiting for completion" << std::endl;
         return;
     }
 
     try {
         script->ensureParsed();
         const auto& expressions = script->getParsedExpressions();
+
+        std::cout << "  Total Expressions: " << expressions.size() << std::endl;
         
         if (expressions.empty()) {
             return;
@@ -70,36 +142,39 @@ void Robot::executeNextInstruction() {
 
         // Reset instruction pointer if we've reached the end
         if (instructionPointer >= expressions.size()) {
+            std::cout << "  Resetting instruction pointer" << std::endl;
             instructionPointer = 0;
         }
 
+        // Print current instruction
+        std::cout << "  Executing: " << expressions[instructionPointer]->toString() << std::endl;
+
         // Create evaluator and execute current instruction
         Rocket::Evaluator evaluator(this);
-        evaluator.evaluate(expressions[instructionPointer]);
         
-        // Move to next instruction
-        instructionPointer++;
+        // Try to evaluate the expression
+        try {
+            evaluator.evaluate(expressions[instructionPointer]);
+            
+            // Only increment instruction pointer if we don't have a pending command
+            // If we have a pending command, we'll increment after it completes
+            if (!currentCommand) {
+                instructionPointer++;
+                // If there's no command, immediately try to execute the next instruction
+                executeNextInstruction();
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Error evaluating expression: " << e.what() << std::endl;
+            // Increment the instruction pointer anyway to avoid getting stuck
+            instructionPointer++;
+            // Try the next instruction
+            executeNextInstruction();
+        }
 
     } catch (const std::exception& e) {
         std::cerr << "Error executing instruction: " << e.what() << std::endl;
         isCodeRunning = false;
-    }
-}
-
-void Robot::queueCommand(std::unique_ptr<RobotCommand> command) {
-    commandQueue.push(std::move(command));
-    
-    // If this is the only command and we're ready, execute it
-    if (commandQueue.size() == 1 && isReadyForNextCommand()) {
-        executeNextCommand();
-    }
-}
-
-void Robot::executeNextCommand() {
-    if (!commandQueue.empty() && isReadyForNextCommand()) {
-        currentCommand = std::move(commandQueue.front());
-        commandQueue.pop();
-        currentCommand->execute(this);
+        currentState = RobotState::ERROR;
     }
 }
 
@@ -132,16 +207,6 @@ void Robot::startRotate(float angle) {
     if (targetRotation < 0) targetRotation += 360.0f;
 }
 
-void Robot::onCommandComplete() {
-    currentCommand.reset();
-    executeNextCommand();  // Try to execute next command
-    
-    // If no more commands and running script, try next instruction
-    if (commandQueue.empty() && isCodeRunning) {
-        executeNextInstruction();
-    }
-}
-
 void Robot::updateMovement(float deltaTime) {
     if (!isMoving) return;
 
@@ -154,7 +219,7 @@ void Robot::updateMovement(float deltaTime) {
         
         // Check if current command is complete
         if (currentCommand && currentCommand->isComplete(this)) {
-            onCommandComplete();
+            onCommandCompleted(this, currentCommand.get());
         }
     } else {
         // Continue movement
@@ -181,12 +246,12 @@ void Robot::updateRotation(float deltaTime) {
         
         // Check if current command is complete
         if (currentCommand && currentCommand->isComplete(this)) {
-            onCommandComplete();
+            onCommandCompleted(this, currentCommand.get());
         }
     } else {
         // Continue rotation
         float rotateDir = (remainingRotation > 0) ? 1.0f : -1.0f;
-        Entity::rotate(rotateAmount * rotateDir);
+        rotate(rotateAmount * rotateDir);
         remainingRotation -= rotateAmount * rotateDir;
     }
 }

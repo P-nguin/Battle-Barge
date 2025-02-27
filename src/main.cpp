@@ -83,11 +83,13 @@ int main() {
             "Turret Info:\n"
             "Position: (%.1f, %.1f)\n"
             "Rotation: %.1f degrees\n"
-            "Ammo: %d",
+            "Ammo: %d\n"
+            "ID: %d\n",
             turretPtr->getPosition().x,
             turretPtr->getPosition().y,
             turretPtr->getGlobalAngle(),
-            turretPtr->getAmmo()
+            turretPtr->getAmmo(),
+            turretPtr->getId()
         );
 
         BeginDrawing();
@@ -96,7 +98,7 @@ int main() {
         gameManager.render();
         
         DrawText(debugInfo, 10, 10, 20, WHITE);
-        DrawText(TextFormat("FPS: %d", GetFPS()), 10, 100, 20, WHITE);
+        DrawText(TextFormat("FPS: %d", GetFPS()), 10, 120, 20, WHITE);
         
         EndDrawing();
     }

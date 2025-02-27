@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <functional>
+#include <string>
 #include "raylib.h"
 #include "raymath.h"
 #include "../Parser/Parser.h"
@@ -16,18 +17,26 @@ class Value {
 private:
     enum class Type {
         NUMBER,
+        STRING,
         VOID
     };
 
     Type type;
     double number;
+    std::string str;
 
 public:
     Value() : type(Type::VOID), number(0) {}
     Value(double n) : type(Type::NUMBER), number(n) {}
+    Value(const std::string& s) : type(Type::STRING), str(s) {}
 
     bool isNumber() const { return type == Type::NUMBER; }
+    bool isString() const { return type == Type::STRING; }
+
     double asNumber() const;
+    std::string asString() const;
+
+    std::string toString() const;
 };
 
 class Evaluator {
@@ -43,10 +52,7 @@ public:
         setupCommands();
     }
 
-    // Evaluate a single expression
     Value evaluate(const ExprPtr& expr);
-    
-    // Evaluate multiple expressions
     std::vector<Value> evaluateAll(const std::vector<ExprPtr>& expressions);
 };
 

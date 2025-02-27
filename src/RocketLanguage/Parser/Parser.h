@@ -29,6 +29,15 @@ public:
     std::string toString() const override;
 };
 
+// String literal ("fire", "reload")
+class StringExpr : public Expression {
+    std::string value;
+public:
+    explicit StringExpr(std::string v) : value(std::move(v)) {}
+    const std::string& getValue() const { return value; }
+    std::string toString() const override;
+};
+
 // Command expression ((forward 10), (+ 1 2))
 class CommandExpr : public Expression {
     std::string name;

@@ -7,11 +7,12 @@
 namespace Rocket {
 
 enum class TokenType {
-    NUMBER,     // 123, -456, 3.14
+    NUMBER,
+    STRING,
     SYMBOL,     // forward, +, *, /
     LPAREN,     // (
     RPAREN,     // )
-    BINDING,    // $pos_x, $pos_y, $direction
+    BINDING,    // $pos_x, $pos_y, $direction, $id
     END         // End of input marker
 };
 
@@ -37,6 +38,7 @@ private:
     void skipWhitespace();
     
     Token readNumber();
+    Token readString();
     Token readSymbol();
     Token readBinding();
     bool isAtEnd() const;

@@ -8,8 +8,8 @@ public:
     // Constants for Grunt stats
     static constexpr float DEFAULT_HEALTH = 50.0f;
     static constexpr float DEFAULT_ARMOR = 1.0f;
-    static constexpr float DEFAULT_SPEED = 5.0f;
-    static constexpr float DEFAULT_ROTATION_SPEED = 30.0f;
+    static constexpr float DEFAULT_SPEED = 64.0f;
+    static constexpr float DEFAULT_ROTATION_SPEED = 90.0f;
     static constexpr float DEFAULT_ENERGY = 75.0f;
     static constexpr float DEFAULT_SIZE = 16.0f;
 

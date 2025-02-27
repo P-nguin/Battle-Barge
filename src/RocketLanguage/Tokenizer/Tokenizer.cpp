@@ -79,6 +79,43 @@ Token Tokenizer::readNumber() {
     return Token(TokenType::NUMBER, number, line, startColumn);
 }
 
+Token Tokenizer::readString() {
+    int startColumn = column;
+    std::string str;
+    
+    // Skip the opening quote
+    advance();
+    
+    while (!isAtEnd() && peek() != '"') {
+        // Handle escape sequences
+        if (peek() == '\\' && position + 1 < input.length()) {
+            advance(); // Skip the backslash
+            
+            char next = peek();
+            switch (next) {
+                case 'n': str += '\n'; break;
+                case 't': str += '\t'; break;
+                case 'r': str += '\r'; break;
+                case '\\': str += '\\'; break;
+                case '"': str += '"'; break;
+                default: str += next; break;
+            }
+            advance();
+        } else {
+            str += advance();
+        }
+    }
+    
+    if (isAtEnd() || peek() != '"') {
+        throw std::runtime_error("Unterminated string literal");
+    }
+    
+    // Skip the closing quote
+    advance();
+    
+    return Token(TokenType::STRING, str, line, startColumn);
+}
+
 Token Tokenizer::readSymbol() {
     int startColumn = column;
     std::string symbol;
@@ -137,6 +174,10 @@ Token Tokenizer::nextToken() {
     if (c == ')') {
         advance();
         return Token(TokenType::RPAREN, ")", line, column - 1);
+    }
+
+    if (c == '"') {
+        return readString(); // Handle string literals
     }
     
     if (c == '$') {

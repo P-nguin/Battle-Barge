@@ -1,10 +1,14 @@
 #include "Entity.h"
 
+size_t Entity::ENTITYID = 0;
+
 Entity::Entity(const std::vector<Vector2>& vertices, Vector2 position, float rotation, float health, float armour, float speed, Texture2D* texture)
     : hitBox(vertices, position, rotation),
       health(health), armour(armour), speed(speed), rotation(0), 
       texture(texture)
-{}
+{
+    entityId = ENTITYID++;
+}
 
 Entity::~Entity()
 {
@@ -79,4 +83,11 @@ void InteractableEntity::move(Vector2 offset) {
 void InteractableEntity::rotate(float angle) {
     interactableHitBox.updateRotation(angle);
     Entity::rotate(angle);
+}
+
+bool InteractableEntity::canBeInteractedWith(const Entity* interactor) const {
+    // Check if the interactor's hitbox intersects with our interactable hitbox
+    if (!interactor) return false;
+    
+    return interactableHitBox.checkCollision(interactor->getHitBox());
 }

@@ -15,6 +15,9 @@ class Entity {
         float speed;
         float rotation;
         Texture2D* texture;
+        size_t entityId;
+
+        static size_t ENTITYID;
 
     public:
         Entity(const std::vector<Vector2>& vertices, Vector2 position, float rotation,
@@ -30,6 +33,7 @@ class Entity {
         float getArmour() const;
         Texture2D* getTexture() const;
         const HitBox& getHitBox() const;
+        size_t getId() const { return entityId; }
 
         virtual void setPosition(Vector2 position);
         virtual void setRotation(float rotation);
@@ -53,14 +57,14 @@ class InteractableEntity : public Entity {
         InteractableEntity(const std::vector<Vector2>& vertices, Vector2 position, float rotation,
                            float health, float armour, float speed, Texture2D* texture = nullptr);
         
-        // virtual void interact() = 0;
-
         virtual void setPosition(Vector2 position) override;
         virtual void setRotation(float rotation) override;
         virtual void move(Vector2 offset) override;
         virtual void rotate(float angle) override;
 
-        virtual void interact(TurretCommands cmd) = 0;
+        virtual bool interact(const std::string& commandStr) = 0;
+        virtual bool canBeInteractedWith(const Entity* interactor) const;
+        virtual bool canInteract(const std::string& commandStr) const = 0;
 };
 
 

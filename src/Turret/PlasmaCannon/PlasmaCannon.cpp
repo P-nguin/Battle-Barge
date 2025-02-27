@@ -16,17 +16,15 @@ void PlasmaCannon::initializeBulletSpawns() {
 }
 
 void PlasmaCannon::update(float deltaTime) {
-    // Handle any plasma cannon specific updates here
+    Turret::update(deltaTime);
 }
 
-void PlasmaCannon::fire() {
-    if (getAmmo() > 0) {
+bool PlasmaCannon::fire() {
+    if (getAmmo() > 0 && getFireCooldown() <= 0.0f) {
         std::cout << "PLASMA CANNON FIRED!" << std::endl;
         
-        // Get all spawn points in world space (already rotated)
+        // Create bullets at all spawn points
         auto worldSpawnPoints = getWorldSpawnPoints();
-        
-        // Create bullets at each spawn point
         for (const auto& spawnPoint : worldSpawnPoints) {
             GameManager::Instance->createBullet(
                 spawnPoint,      // position
@@ -37,6 +35,20 @@ void PlasmaCannon::fire() {
             );
         }
         
+        // Call the parent's fire() to handle ammo reduction and cooldown
         Turret::fire();
+        return true;  // Always return true when we actually fire
+    } else {
+        // Call the parent's fire to get the messages, but return false
+        Turret::fire();
+        return false;  // Return false for cooldown or no ammo
     }
+}
+
+bool PlasmaCannon::interact(const std::string& commandStr) {
+    return Turret::interact(commandStr);
+}
+
+bool PlasmaCannon::canInteract(const std::string& cmdStr) const {
+    return Turret::canInteract(cmdStr);
 }

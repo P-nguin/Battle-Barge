@@ -23,6 +23,11 @@ Grunt::Grunt(Vector2 position, float rotation)
 void Grunt::update(float deltaTime) {
     updateMovement(deltaTime);
     updateRotation(deltaTime);
+
+    auto* currentCommand = getCurrentCommand();
+    if(currentCommand) {
+        currentCommand->update(this, deltaTime);
+    }
 }
 
 void Grunt::render() {

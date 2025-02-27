@@ -12,9 +12,11 @@ public:
                     int ammo, float reloadTime, Texture2D* texture = nullptr);
     
     void update(float deltaTime) override;
-    void fire() override;
+    bool fire() override;
     void initializeBulletSpawns();
 
+    bool interact(const std::string& commandStr) override;
+    bool canInteract(const std::string &cmdStr) const override;
 };
 
 #endif

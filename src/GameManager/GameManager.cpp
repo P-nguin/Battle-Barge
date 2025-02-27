@@ -29,6 +29,7 @@ GameManager::GameManager(int mapWidth, int mapHeight)
 
 void GameManager::initializePlayer(const std::vector<Vector2>& vertices, Vector2 position, float rotation, float health, float armour, float speed, Texture2D* texture) {
     player = std::make_unique<Player>(vertices, position, rotation, health, armour, speed, texture);
+    registerEntity(player.get());
     camera.setTrackedEntity(player.get());
 }
 
@@ -120,10 +121,12 @@ void GameManager::checkBulletCollisions() {
 }
 
 void GameManager::addTurret(std::unique_ptr<Turret> turret) {
+    registerEntity(turret.get());
     turrets.push_back(std::move(turret));
 }
 
 void GameManager::removeTurret(Turret* turret) {
+    unregisterEntity(turret);
     turrets.erase(
         std::remove_if(turrets.begin(), turrets.end(),
             [turret](const auto& t) { return t.get() == turret; }
@@ -139,10 +142,12 @@ void GameManager::updateTurrets(float deltaTime) {
 }
 
 void GameManager::addEnemy(std::unique_ptr<Enemy> enemy) {
+    registerEntity(enemy.get());
     enemies.push_back(std::move(enemy));
 }
 
 void GameManager::removeEnemy(Enemy* enemy) {
+    unregisterEntity(enemy);
     enemies.erase(
         std::remove_if(enemies.begin(), enemies.end(),
             [enemy](const auto& e) { return e.get() == enemy; }
@@ -234,3 +239,32 @@ void GameManager::render() {
 
     robotManager.renderRobots();
 }
+
+Entity* GameManager::getEntityById(size_t id) {
+    auto it = entityMap.find(id);
+    if (it != entityMap.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+void GameManager::registerEntity(Entity* entity) {
+    if (!entity) return;
+    
+    size_t id = entity->getId();
+    entityMap[id] = entity;
+    
+    std::cout << "Entity registered with ID: " << id << std::endl;
+}
+
+void GameManager::unregisterEntity(Entity* entity) {
+    if (!entity) return;
+    
+    size_t id = entity->getId();
+    auto it = entityMap.find(id);
+    if (it != entityMap.end() && it->second == entity) {
+        entityMap.erase(it);
+        std::cout << "Entity unregistered with ID: " << id << std::endl;
+    }
+}
+

@@ -34,9 +34,9 @@ void Player::handleMovement(float deltaTime)
     // std::cout << rotation << std::endl;
     relMousePos = GameManager::Instance->getCameraController().getScreenToWorld(GetMousePosition());
     lookDir = Vector2Subtract(relMousePos, getPosition());
-    std::cout << lookDir.x << " " << lookDir.y << std::endl;
-    std::cout << getPosition().x << " " << getPosition().y << std::endl;
-    std::cout << std::endl;
+    // std::cout << lookDir.x << " " << lookDir.y << std::endl;
+    // std::cout << getPosition().x << " " << getPosition().y << std::endl;
+    // std::cout << std::endl;
     
     rotation = atan((lookDir.y)/(lookDir.x)) * RAD2DEG;
     hitBox.setRotation(rotation);
@@ -73,7 +73,7 @@ void Player::update(float deltaTime) {
         InteractableEntity* turret = nullptr;
         if (checkInteract(turret)){
             std::cout << "Interacting with turret: " << turret << std::endl;
-            turret->interact(TurretCommands::FIRE);
+            turret->interact("fire");
         } else {
             std::cout << "No interactable entity found" << std::endl;
         }

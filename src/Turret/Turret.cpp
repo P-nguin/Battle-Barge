@@ -1,5 +1,12 @@
 #include "Turret.h"
 
+std::unordered_map<std::string, TurretCommands> Turret::VALIDCOMMANDS = {
+    {"fire", TurretCommands::FIRE},
+    {"turnleft", TurretCommands::TURNLEFT},
+    {"turnright", TurretCommands::TURNRIGHT},
+    {"reload", TurretCommands::RELOAD}
+};
+
 Turret::Turret(const std::vector<Vector2>& vertices, Vector2 position,
                float forwardAngle, float health, float armour,
                float turnRate, float range, float fireRate,
@@ -30,13 +37,28 @@ Turret::Turret(const std::vector<Vector2>& vertices, Vector2 position,
     interactableHitBox = HitBox(interactVertices, position, forwardAngle);
 }
 
-void Turret::fire() {
-    if (ammo > 0) {
+void Turret::update(float deltaTime) {
+    if (fireCooldown > 0.0f) {
+        fireCooldown -= deltaTime;
+        if (fireCooldown < 0.0f) {
+            fireCooldown = 0.0f;
+        }
+    }
+}
+
+bool Turret::fire() {
+    if (ammo > 0 && fireCooldown <= 0.0f) {
         std::cout << "FIRE" << std::endl;
         ammo--;
-    } else {
+
+        fireCooldown = 1.0f / fireRate;
+        return true;
+    } else if (ammo <= 0) {
         std::cout << "NO AMMO" << std::endl;
+    } else {
+        std::cout << "WEAPON ON COOLDOWN: " << fireCooldown << " seconds remaining" << std::endl;
     }
+    return false;
 }
 
 void Turret::rotate(float angle, float deltaTime) {
@@ -83,10 +105,16 @@ void Turret::render() {
     #endif
 }
 
-void Turret::interact(TurretCommands cmd) {
+bool Turret::interact(const std::string& commandStr) {
+    if (!canInteract(commandStr)) {
+        std::cerr << "Turret does not support command: " << commandStr << std::endl;
+        return false;
+    }
+
+    TurretCommands cmd = VALIDCOMMANDS[commandStr];
     switch (cmd) {
         case TurretCommands::FIRE:
-            fire();
+            return fire();
             break;
         case TurretCommands::TURNLEFT:
             rotate(-turnRate, GetFrameTime());
@@ -98,6 +126,11 @@ void Turret::interact(TurretCommands cmd) {
             reload();
             break;
     }
+    return true;
+}
+
+bool Turret::canInteract(const std::string& cmdStr) const {
+    return VALIDCOMMANDS.find(cmdStr) != VALIDCOMMANDS.end();
 }
 
 void Turret::reload() {

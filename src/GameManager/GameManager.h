@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <unordered_map>
 
 #include "Map/TileMap.h"
 #include "Entity/Entity.h"
@@ -38,6 +39,8 @@ private:
     std::unique_ptr<Player> player;
     CameraController camera;
     GameMode currentMode;
+
+    std::unordered_map<size_t, Entity*> entityMap;
     
 public:
     const float HIT_COOLDOWN = 1.0f;
@@ -83,6 +86,12 @@ public:
     // Input handling
     void handleBuildModeInput();
     void handlePlayModeInput();
+
+    // Entity management
+    // We have way too many vectors of everything, we need to reorganize and optimize GameManager
+    Entity* getEntityById(size_t id);
+    void registerEntity(Entity* entity);
+    void unregisterEntity(Entity* entity);
 };
 
 #endif
