@@ -15,6 +15,8 @@ public:
     void fire() override;
     void initializeBulletSpawns();
 
+    void interact() override;
+
 };
 
 #endif

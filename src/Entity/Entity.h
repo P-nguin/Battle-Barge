@@ -47,21 +47,4 @@ class Entity {
         virtual void update(float deltaTime) = 0;
 };
 
-class InteractableEntity : public Entity {
-    protected:
-        HitBox interactableHitBox;
-    public:
-        InteractableEntity(const std::vector<Vector2>& vertices, Vector2 position, float rotation,
-                           float health, float armour, float speed, Texture2D* texture = nullptr);
-        
-        // virtual void interact() = 0;
-
-        virtual void setPosition(Vector2 position) override;
-        virtual void setRotation(float rotation) override;
-        virtual void move(Vector2 offset) override;
-        virtual void rotate(float angle) override;
-        virtual void interact(TurretCommands cmd) = 0;
-};
-
-
 #endif
