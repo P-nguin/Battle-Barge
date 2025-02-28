@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "../Entity/Entity.h"
+#include "Entity/IInteractable.h"
 
 enum class AmmoType {
     HE
@@ -19,7 +20,7 @@ enum class TurretCommands {
     RELOAD,
 };
 
-class Turret : public InteractableEntity {
+class Turret : public Entity, public IInteractable {
 protected:
     float forwardAngle;
     float localAngle;
@@ -57,7 +58,7 @@ public:
     int getAmmo() const { return ammo; }
 
     void render();
-    void interact(TurretCommands cmd);
+    void turretInteract(TurretCommands cmd);
 
     void addBulletSpawnPoint(Vector2 localPoint);
     std::vector<Vector2> getWorldSpawnPoints() const;

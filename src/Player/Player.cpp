@@ -50,7 +50,7 @@ void Player::render() {
     }
 }
 
-bool Player::checkInteract(InteractableEntity* &entity) {
+bool Player::checkInteract(IInteractable* &entity) {
     for (auto& turret : GameManager::Instance->getTurrets()) {
         HitBox forwardHitBox = HitBox::rayHitBox( getPosition(), getRotationVector(), INTERACT_DISTANCE);
         if (turret->getHitBox().checkCollision(forwardHitBox)) {
@@ -77,30 +77,14 @@ void Player::handleInput(float deltaTime) {
             std::cout << "Detach from entity" << std::endl;
             controllingEntity = nullptr;
         }
-
-        if (IsKeyPressed(KEY_R)) {
-            // std::cout << "Reload" << std::endl;
-            controllingEntity->interact(TurretCommands::RELOAD);
+        else if (IsKeyDown(KEY_R) || IsKeyDown(KEY_E) || IsKeyDown(KEY_D) || IsKeyDown(KEY_A)) {
+            controllingEntity->interact();
         }
-        if (IsKeyPressed(KEY_E)) {
-            // std::cout << "Fire" << std::endl;
-            controllingEntity->interact(TurretCommands::FIRE);
-        }
-
-        if (IsKeyDown(KEY_A)) {
-            // std::cout << "Turn left" << std::endl;
-            controllingEntity->interact(TurretCommands::TURNLEFT);
-        }
-        if (IsKeyDown(KEY_D)) {
-            // std::cout << "Turn right" << std::endl;
-            controllingEntity->interact(TurretCommands::TURNRIGHT);
-        }
-
 
     } else {
         handleMovement(deltaTime);
         if (IsKeyPressed(KEY_F)) {
-            InteractableEntity* turret = nullptr;
+            IInteractable* turret = nullptr;
             if (checkInteract(turret)){
                 std::cout << "Interacting with turret: " << turret << std::endl;
             } else {

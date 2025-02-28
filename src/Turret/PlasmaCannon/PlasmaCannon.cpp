@@ -40,3 +40,22 @@ void PlasmaCannon::fire() {
         Turret::fire();
     }
 }
+
+void PlasmaCannon::interact() {
+    if (IsKeyPressed(KEY_R)) {
+        // std::cout << "Reload" << std::endl;
+        Turret::turretInteract(TurretCommands::RELOAD);
+    }
+    if (IsKeyPressed(KEY_E)) {
+        // std::cout << "Fire" << std::endl;
+        Turret::turretInteract(TurretCommands::FIRE);
+    }
+    if (IsKeyDown(KEY_A)) {
+        // std::cout << "Turn left" << std::endl;
+        Turret::turretInteract(TurretCommands::TURNLEFT);
+    }
+    if (IsKeyDown(KEY_D)) {
+        // std::cout << "Turn right" << std::endl;
+        Turret::turretInteract(TurretCommands::TURNRIGHT);
+    }
+}
