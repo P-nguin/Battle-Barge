@@ -12,6 +12,7 @@ private:
     Camera2D camera;
     Entity* trackedEntity;
     Vector2 position;
+    Vector2 targetPosition;
     float zoom;
     float targetZoom;
     float smoothSpeed;
@@ -25,7 +26,7 @@ public:
 
     void update(float deltaTime);
     void setTrackedEntity(Entity* entity);
-    void setPosition(Vector2 pos);
+    void setTargetPosition(Vector2 pos);
     
     const Camera2D& getCamera() const { return camera; }
     Vector2 getScreenToWorld(Vector2 screenPos) const;

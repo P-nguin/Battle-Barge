@@ -14,7 +14,7 @@ GameManager::GameManager(int mapWidth, int mapHeight)
     tilemap = std::make_unique<TileMap>(mapWidth, mapHeight);
     currentMode = GameMode::PLAY;
 
-    // Initalize Player
+    // Initialize Player
     float playerWidth = 32;
     float playerHeight = 32;
     std::vector<Vector2> playerVertices = {
@@ -25,6 +25,9 @@ GameManager::GameManager(int mapWidth, int mapHeight)
     };
     Vector2 playerPosition = {400, 300};
     initializePlayer(playerVertices, playerPosition, 0.f, 10.f, 0.f, 64.0f, nullptr);
+    
+    // Initialize BuildManager with tilemap and camera
+    buildManager = std::make_unique<BuildManager>(tilemap.get(), &camera);
 }
 
 void GameManager::initializePlayer(const std::vector<Vector2>& vertices, Vector2 position, float rotation, float health, float armour, float speed, Texture2D* texture) {
@@ -157,40 +160,25 @@ void GameManager::updateEnemies(float deltaTime) {
     }
 }
 
-void GameManager::handleBuildModeInput() {
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        Vector2 mousePos = GetMousePosition();
-        Tile* clickedTile = tilemap->getTileAtScreenPosition(mousePos);
-        if (clickedTile) {
-            // For now, just toggle between VOID and STUFF
-            if (clickedTile->type == TileType::VOID) {
-                int tileX = static_cast<int>(mousePos.x) / Tile::TILE_SIZE;
-                int tileY = static_cast<int>(mousePos.y) / Tile::TILE_SIZE;
-                tilemap->setTile(tileX, tileY, new StuffTile(tileX, tileY));
-            } else {
-                int tileX = static_cast<int>(mousePos.x) / Tile::TILE_SIZE;
-                int tileY = static_cast<int>(mousePos.y) / Tile::TILE_SIZE;
-                tilemap->setTile(tileX, tileY, new VoidTile(tileX, tileY));
-            }
-        }
-    }
-}
-
 void GameManager::update(float deltaTime) {
-    camera.update(deltaTime);
-
-    if (IsKeyPressed(KEY_B)) {
-        std::cout << "Switching GameMode to ";
-        if(currentMode == GameMode::PLAY) {
+    // Handle game mode switching
+    if (IsKeyPressed(KEY_B) || (IsKeyPressed(KEY_ESCAPE) && currentMode == GameMode::BUILD)) {
+        if (currentMode == GameMode::PLAY) {
             currentMode = GameMode::BUILD;
-            std::cout << "BUILD" << std::endl;
-        }
-        else if(currentMode == GameMode::BUILD) {
+            buildManager->enter();
+        } else if (currentMode == GameMode::BUILD) {
             currentMode = GameMode::PLAY;
-            std::cout << "PLAY" << std::endl;
+            buildManager->exit();
+            
+            // Reattach camera to player when exiting build mode
+            camera.setTrackedEntity(player.get());
         }
     }
-    else if (currentMode == GameMode::PLAY) {
+    
+    // Always update camera
+    camera.update(deltaTime);
+    
+    if (currentMode == GameMode::PLAY) {
         handlePlayModeInput();
         player->update(deltaTime);
         updateTurrets(deltaTime);
@@ -199,10 +187,9 @@ void GameManager::update(float deltaTime) {
         for (Entity& entity : entities) {
             entity.update(deltaTime);
         }
-
         updateBullets(deltaTime);
     } else if (currentMode == GameMode::BUILD) {
-        handleBuildModeInput();
+        buildManager->update(deltaTime);
     }
 }
 
@@ -210,7 +197,9 @@ void GameManager::render() {
     BeginMode2D(camera.getCamera());
 
     tilemap->render();
-    if(currentMode == GameMode::BUILD) {
+    
+    // Always show grid in build mode
+    if (currentMode == GameMode::BUILD) {
         tilemap->renderGrid();
     }
     
@@ -233,4 +222,10 @@ void GameManager::render() {
     player->render();
 
     robotManager.renderRobots();
+    
+    if (currentMode == GameMode::BUILD) {
+        buildManager->render();
+    }
+    
+    EndMode2D();
 }

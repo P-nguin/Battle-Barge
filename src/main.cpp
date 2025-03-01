@@ -5,6 +5,8 @@
 #include "Turret/Turret.h"
 #include "Robots/Grunt/Grunt.h"
 #include "Robots/RobotManager/RobotManager.h"
+#include "GameManager/GameManager.h"
+#include "BuildManager/BuildManager.h"
 #include "resource_dir.h"
 #include <iostream>
 
@@ -76,8 +78,6 @@ int main() {
         // Update game manager (handles turret and bullet updates)
         gameManager.update(deltaTime);
 
-        // Robots are now updated in gameManager.update(deltaTime)
-
         // Debug info
         const char* debugInfo = TextFormat(
             "Turret Info:\n"
@@ -95,6 +95,7 @@ int main() {
         
         gameManager.render();
         
+        // Draw debug info after rendering the game
         DrawText(debugInfo, 10, 10, 20, WHITE);
         DrawText(TextFormat("FPS: %d", GetFPS()), 10, 100, 20, WHITE);
         

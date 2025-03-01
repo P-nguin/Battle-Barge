@@ -18,6 +18,7 @@ public:
 
     Tile(int x, int y, TileType type);
     virtual void render() const = 0;
+    virtual void renderPreview() const = 0;
     virtual std::string getInfo() const;
 };
 
@@ -25,12 +26,14 @@ class VoidTile : public Tile {
 public:
     VoidTile(int x, int y);
     void render() const override;
+    void renderPreview() const override;
 };
 
 class StuffTile : public Tile {
 public:
     StuffTile(int x, int y);
     void render() const override;
+    void renderPreview() const override;
 };
 
 #endif
