@@ -15,6 +15,7 @@
 #include "Robots/Robot/Robot.h"
 #include "Player/Player.h"
 #include "CameraController/CameraController.h"
+#include "BuildManager/BuildManager.h"
 
 class Enemy;
 class Player;
@@ -37,6 +38,7 @@ private:
     RobotManager& robotManager;
     std::unique_ptr<Player> player;
     CameraController camera;
+    std::unique_ptr<BuildManager> buildManager;
     GameMode currentMode;
     
 public:
@@ -48,6 +50,7 @@ public:
     TileMap* getTileMap() { return tilemap.get(); }
     RobotManager& getRobotManager() { return robotManager; }
     Player* getPlayer() { return player.get(); }
+    BuildManager* getBuildManager() { return buildManager.get(); }
     const CameraController& getCamera() const { return camera; }
 
     void initializePlayer(const std::vector<Vector2>& vertices, Vector2 position, 
@@ -80,8 +83,6 @@ public:
 
     CameraController& getCameraController() { return camera; }
 
-    // Input handling
-    void handleBuildModeInput();
     void handlePlayModeInput();
 };
 

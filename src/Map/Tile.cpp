@@ -19,8 +19,22 @@ void VoidTile::render() const {
     DrawRectangle(x, y, TILE_SIZE, TILE_SIZE, BLUE);
 }
 
+void VoidTile::renderPreview() const {
+    Color previewColor = BLUE;
+    previewColor.a = 128;
+    DrawRectangle(x, y, TILE_SIZE, TILE_SIZE, previewColor);
+    DrawRectangleLines(x, y, TILE_SIZE, TILE_SIZE, WHITE);
+}
+
 StuffTile::StuffTile(int x, int y): Tile(x, y, TileType::STUFF) {}
 
 void StuffTile::render() const {
     DrawRectangle(x, y, TILE_SIZE, TILE_SIZE, GRAY);
+}
+
+void StuffTile::renderPreview() const {
+    Color previewColor = GRAY;
+    previewColor.a = 128;
+    DrawRectangle(x, y, TILE_SIZE, TILE_SIZE, previewColor);
+    DrawRectangleLines(x, y, TILE_SIZE, TILE_SIZE, WHITE);
 }
