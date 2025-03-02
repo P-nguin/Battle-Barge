@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 class Robot;
 class CommandObserver;
