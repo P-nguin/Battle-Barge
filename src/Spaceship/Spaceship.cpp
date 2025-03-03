@@ -14,5 +14,4 @@ void Spaceship::render(){
 }
 
 void Spaceship::update() {
-
 }
