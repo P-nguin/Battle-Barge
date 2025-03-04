@@ -117,6 +117,7 @@
     "typeindex": "cpp",
     "valarray": "cpp",
     "__tree": "cpp",
-    "queue": "cpp"
+    "queue": "cpp",
+    "*.m": "cpp"
   }
 }

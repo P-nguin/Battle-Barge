@@ -7,6 +7,8 @@
 #include "Robots/RobotManager/RobotManager.h"
 #include "GameManager/GameManager.h"
 #include "BuildManager/BuildManager.h"
+#include "Spaceship/Spaceship.h"
+#include "Spaceship/SpaceshipTile.h"
 #include "resource_dir.h"
 #include <iostream>
 
