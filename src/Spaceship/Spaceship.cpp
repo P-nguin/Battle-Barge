@@ -1,7 +1,7 @@
 #include "Spaceship.h"
 
 
-Spaceship::Spaceship(std::vector<std::vector<std::unique_ptr<SpaceshipTile>>> tiles): position{Vector2{0,0}}, health{100}, tiles{tiles} {}
+Spaceship::Spaceship(std::vector<std::vector<SpaceshipTile*>> tiles): position{Vector2{0,0}}, health{100}, tiles{std::move(tiles)} {}
 
 void Spaceship::render(){
     for (int i = 0; i < tiles.size(); i++){
@@ -13,6 +13,16 @@ void Spaceship::render(){
 }
 
 void Spaceship::update() {
-
+    if (IsKeyDown(KEY_J)) {
+        position.x -= 1;
+    }
+    if (IsKeyDown(KEY_L)) {
+        position.x += 1;
+    }
+    if (IsKeyDown(KEY_I)) {
+        position.y -= 1;
+    }
+    if (IsKeyDown(KEY_K)) {
+        position.y += 1;
+    }
 }
-

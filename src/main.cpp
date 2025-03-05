@@ -79,13 +79,15 @@ int main() {
 
 
     // Create spaceship
-    std::vector<std::vector<SpaceshipTile>> spaceshipTiles = {
-        { WallTile(), WallTile(), WallTile(), WallTile() },
-        { WallTile(), WallTile(), WallTile(), WallTile() },
-        { WallTile(), WallTile(), WallTile(), WallTile() },
-        { WallTile(), WallTile(), WallTile(), WallTile() }
+    std::vector<std::vector<SpaceshipTile*>> spaceshipTiles = {
+        { new WallTile(), new WallTile(), new WallTile(), new WallTile() },
+        { new WallTile(), new FloorTile(), new FloorTile(), new WallTile() },
+        { new WallTile(), new FloorTile(), new FloorTile(), new WallTile() },
+        { new WallTile(), new WallTile(), new WallTile(), new WallTile() }
     };
     
+    Spaceship spaceship = Spaceship(spaceshipTiles);
+
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();
 
@@ -112,6 +114,9 @@ int main() {
         // Draw debug info after rendering the game
         DrawText(debugInfo, 10, 10, 20, WHITE);
         DrawText(TextFormat("FPS: %d", GetFPS()), 10, 100, 20, WHITE);
+
+        spaceship.render();
+        spaceship.update();
         
         EndDrawing();
     }

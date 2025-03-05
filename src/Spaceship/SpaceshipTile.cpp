@@ -29,4 +29,7 @@ void FloorTile::render(Vector2 pos) {
     DrawTexture(texture, pos.x, pos.y, WHITE );
 }
 
-
+void TurretTile::render(Vector2 pos) {
+    turret->setPosition(pos);
+    turret->render();
+}
