@@ -1,11 +1,15 @@
-#ifndef SpaceshipTile_H
-#define SpaceshipTile_H
+#ifndef SPACESHIPTILE_H
+#define SPACESHIPTILE_H
 
+#include "raylib.h"
+#include "resource_dir.h"
 #include "Turret/PlasmaCannon/PlasmaCannon.h"
-#include "Spaceship.h"
 
 class SpaceshipTile {
-private:
+public:
+    static constexpr int TILE_SIZE = 32;
+
+protected:
     float health;
     float maxHealth;
     float defense;
@@ -13,41 +17,35 @@ private:
 
 public:
     SpaceshipTile(float health, float maxHealth, float defense, float maxDefense);
+    virtual ~SpaceshipTile() = default;  // Virtual destructor for polymorphism
 
-    virtual void render(Spaceship *spaceship) = 0;
+    virtual void render(Vector2 pos);
 };
 
-
-class WallTile : SpaceshipTile {
+// Derived tile types
+class WallTile : public SpaceshipTile {
 public:
     WallTile();
     WallTile(float health, float maxHealth, float defense, float maxDefense);
 
+    void render(Vector2 pos) override;
 };
 
-class FloorTile : SpaceshipTile {
+class FloorTile : public SpaceshipTile {
 public:
     FloorTile();
     FloorTile(float health, float maxHealth, float defense, float maxDefense);
-
+    void render(Vector2 pos) override;
 };
 
-class TurretTile: SpaceshipTile {
+class TurretTile : public SpaceshipTile {
 private:
-    PlasmaCannon turret;
+    Turret *turret;
+
 public:
     TurretTile();
-    TurretTile(PlasmaCannon turret);
-
-};
-
-class ControlTile : SpaceshipTile, IInteractable {
-
-public:
-    ControlTile();
-    ControlTile(float health, float maxHealth, float defense, float maxDefense);
-
-    void interact() override;
+    TurretTile(Turret *turret);
+    void render(Vector2 pos) override;
 };
 
 #endif

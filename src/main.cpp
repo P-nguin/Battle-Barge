@@ -74,6 +74,17 @@ int main() {
     grunt->powerOn();
     grunt->setScript(Script::loadFromFile("Scripts/testScript.txt"));
     gameManager.getRobotManager().addRobot(std::move(grunt));
+
+
+
+
+    // Create spaceship
+    std::vector<std::vector<SpaceshipTile>> spaceshipTiles = {
+        { WallTile(), WallTile(), WallTile(), WallTile() },
+        { WallTile(), WallTile(), WallTile(), WallTile() },
+        { WallTile(), WallTile(), WallTile(), WallTile() },
+        { WallTile(), WallTile(), WallTile(), WallTile() }
+    };
     
     while (!WindowShouldClose()) {
         float deltaTime = GetFrameTime();

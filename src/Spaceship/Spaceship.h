@@ -9,19 +9,20 @@
 class Spaceship {
 private:
     float health;
-    std::vector<std::vector<SpaceshipTile*>> tiles;
+    std::vector<std::vector<std::unique_ptr<SpaceshipTile>>> tiles;
     Vector2 position;
 
 
 public:
-    Spaceship(std::vector<std::vector<SpaceshipTile*>> tiles);
+    Spaceship(std::vector<std::vector<std::unique_ptr<SpaceshipTile>>> tiles);
 
-    std::vector<std::vector<SpaceshipTile*>> getTiles() { return tiles; }
+    Vector2 getPosition() { return position; }
+    const std::vector<std::vector<std::unique_ptr<SpaceshipTile>>>& getTiles() const { return tiles; }
 
+    void takeDamage(float amount){ health -= amount; }
     
     void update();
     void render();
-
 
 };
 
